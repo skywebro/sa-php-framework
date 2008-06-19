@@ -40,12 +40,12 @@ abstract class SA_Application extends SA_Object {
 		return self::$instance;
 	}
 
-	public function &getResponse() {
-		return $this->response;
+	public function &request() {
+		return $this->request;
 	}
 
-	public function &getRequest() {
-		return $this->request;
+	public function &response() {
+		return $this->response;
 	}
 
 	public function setApplicationDir($appDir) {
