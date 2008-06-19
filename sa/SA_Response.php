@@ -18,12 +18,43 @@
  * $Id$
  */
 
-require_once 'SA_Object.php';
+class SA_Response extends SA_Object {
+	protected $headers = null;
+	protected $body = null;
 
-class SA extends SA_Object {
-	public static function autoload($className) {
-		if (preg_match('/^SA_/', $className)) {
-			require_once BASE_DIR . "sa/{$className}.php";
+	public function __construct() {
+		$this->headers = new ArrayObject();
+		$this->headers['Content-type'] = 'text/html; charset=utf-8';
+	}
+
+	public function &headers($name = null, $value = null) {
+		$result = null;
+		if (is_null($name)) {
+			$result = &$this->headers;
+		} elseif (is_null($value)) {
+			$result = &$this->headers[$name];
+		} else {
+			$result = &$this->headers[$name];
+			$this->headers[$name] = $value;
 		}
+		return $result;
+	}
+
+	public function sendHeaders() {
+		if (!headers_sent()) {
+			for($i = $this->headers->getIterator(); $i->valid(); $i->next()) {
+				header($i->key() . ': ' . $i->current());
+			}
+		}
+	}
+
+	public function &body($content = null) {
+		if (!is_null($content)) $this->body = $content;
+		return $this->body;
+	}
+
+	public function send($sendHeaders = true) {
+		if ($sendHeaders) $this->sendHeaders();
+		print $this->body;
 	}
 }

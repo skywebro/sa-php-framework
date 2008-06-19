@@ -20,5 +20,5 @@
 
 require_once 'bootstrap.php';
 
-$app = new Demo_Application();
-$app->run();
+$demo = new Demo_Application();
+$demo->run();

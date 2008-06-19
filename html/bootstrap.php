@@ -19,11 +19,9 @@
  */
 
 define('BASE_DIR', dirname(__FILE__) . '/../');
-define('APP_DIR', BASE_DIR . '/app/');
 
-set_include_path('.:../sa/');
-require_once 'SA.php';
-
+require_once BASE_DIR . 'sa/SA.php';
 spl_autoload_register('SA::autoload');
 
 require_once BASE_DIR . 'Demo_Application.php';
+
