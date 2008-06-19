@@ -18,8 +18,4 @@
  * $Id$
  */
 
-class Page_index extends SA_Page {
-	public function get() {
-		$this->content('in index page');
-	}
-}
+class SA_NoApplication_Exception extends Exception {}

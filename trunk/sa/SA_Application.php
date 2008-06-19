@@ -35,7 +35,7 @@ abstract class SA_Application extends SA_Object {
 
 	public static function &singleton() {
 		if (is_null(self::$instance)) {
-			throw new Exception('Application not instantiated!');
+			throw new SA_NoApplication_Exception('Application not instantiated!');
 		}
 		return self::$instance;
 	}
@@ -74,16 +74,27 @@ abstract class SA_Application extends SA_Object {
 		}
 		require_once $pageFileName;
 		$className = "Page_$pageName";
-		$page = new $className($this->request, $this->response);
-		if (!is_a($page, 'SA_IPage')) {
+		if (!class_exists($className)) {
+			throw new SA_PageInterface_Exception("Class $className does not exist!");
+		}
+		if (!in_array('SA_IPage', class_implements($this->page = new $className($this->request, $this->response)))) {
 			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
 		}
-		return $page;
+		return $this->page;
 	}
 
 	public function run($sendHeaders = true) {
-		$page = &$this->pageFactory();
-		$this->response->body($page->content());
+		try {
+			$this->pageFactory();
+			if ($this->request->isGet()) {
+				$this->page->get();
+			} elseif ($this->request->isPost()) {
+				$this->page->post();
+			}
+			$this->response->body($this->page->content());
+		} catch(Exception $e) {
+			throw $e;
+		}
 		$this->response->send($sendHeaders);
 	}
 }

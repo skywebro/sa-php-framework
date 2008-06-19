@@ -21,4 +21,6 @@
 interface SA_IPage {
 	public function &content($content = null);
 	public function display();
+	public function get();
+	public function post();
 }
