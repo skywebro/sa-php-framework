@@ -19,15 +19,24 @@
  */
 
 abstract class SA_Page extends SA_Object implements SA_IPage {
-	protected $request;
-	protected $response;
+	protected $request = null;
+	protected $response = null;
+	protected $name = null;
 	protected $content = null;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
 		parent::__construct();
-
+		$this->name = $name;
 		$this->request = $request;
 		$this->response = $response;
+	}
+
+	public function setPageName($name) {
+		$this->name = $name;
+	}
+
+	public function getPageName() {
+		return $this->name;
 	}
 
 	public function &content($content = null) {

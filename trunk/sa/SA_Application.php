@@ -30,7 +30,7 @@ abstract class SA_Application extends SA_Object {
 		parent::__construct();
 		$this->request = new SA_Request();
 		$this->response = new SA_Response();
-		$this->instance = &$this;
+		self::$instance = &$this;
 	}
 
 	public static function &singleton() {
@@ -57,7 +57,7 @@ abstract class SA_Application extends SA_Object {
 		return $this;
 	}
 
-	public function &getApplicationDir() {
+	public function getApplicationDir() {
 		return $this->appDir;
 	}
 
@@ -80,6 +80,7 @@ abstract class SA_Application extends SA_Object {
 		if (!in_array('SA_IPage', class_implements($this->page = new $className($this->request, $this->response)))) {
 			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
 		}
+		$this->page->setPageName($pageName);
 		return $this->page;
 	}
 
@@ -92,9 +93,9 @@ abstract class SA_Application extends SA_Object {
 				$this->page->post();
 			}
 			$this->response->body($this->page->content());
+			$this->response->send($sendHeaders);
 		} catch(Exception $e) {
 			throw $e;
 		}
-		$this->response->send($sendHeaders);
 	}
 }

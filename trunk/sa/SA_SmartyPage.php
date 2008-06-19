@@ -18,11 +18,39 @@
  * $Id$
  */
 
-interface SA_IPage {
-	public function setPageName($name);
-	public function getPageName();
-	public function get();
-	public function post();
-	public function &content($content = null);
-	public function display();
+require_once SMARTY_DIR . 'Smarty.class.php';
+
+class SA_SmartyPage extends SA_Page {
+	protected $smarty = null;
+	protected $template = null;
+
+	public function __construct(SA_Request $request, SA_Response $response) {
+		parent::__construct($request, $response);
+		$app = SA_Application::singleton();
+		$this->smarty = new Smarty;
+		$this->smarty->use_sub_dirs = true;
+		$this->smarty->template_dir = $app->getApplicationDir() . 'templates/';
+		$this->smarty->compile_dir = $app->getApplicationDir() . 'templates_c/';
+	}
+
+	public function setPageName($name) {
+		parent::setPageName($name);
+		$this->setTemplate();
+	}
+
+	public function setTemplate($template = null) {
+		$this->template = is_null($template) ? "{$this->name}.tpl" : $template;
+	}
+
+	public function getTemplate($template) {
+		return $this->template;
+	}
+
+	public function &content($content = null) {
+		return $this->smarty->fetch($this->template);
+	}
+
+	public function display() {
+		$this->smarty->display($this->template);
+	}
 }
