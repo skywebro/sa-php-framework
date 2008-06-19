@@ -19,5 +19,25 @@
  */
 
 abstract class SA_Application extends SA_Object {
-	public function run() {}
+	protected $request = null;
+	protected $response = null;
+	protected $appDir = null;
+
+	public function __construct() {
+		$this->request = new SA_Request();
+		$this->response = new SA_Response();
+		$this->appDir = BASE_DIR . 'app/';
+	}
+
+	public function &getResponse() {
+		return $this->response;
+	}
+
+	public function &getRequest() {
+		return $this->request;
+	}
+
+	public function run($sendHeaders = true) {
+		$this->response->send($sendHeaders);
+	}
 }
