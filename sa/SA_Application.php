@@ -24,11 +24,20 @@ abstract class SA_Application extends SA_Object {
 	protected $request = null;
 	protected $response = null;
 	protected $appDir = null;
+	protected static $instance = null;
 
 	public function __construct() {
 		parent::__construct();
 		$this->request = new SA_Request();
 		$this->response = new SA_Response();
+		$this->instance = &$this;
+	}
+
+	public static function &singleton() {
+		if (is_null(self::$instance)) {
+			throw new Exception('Application not instantiated!');
+		}
+		return self::$instance;
 	}
 
 	public function &getResponse() {
@@ -43,7 +52,7 @@ abstract class SA_Application extends SA_Object {
 		if (is_dir($appDir) && is_readable($appDir)) {
 			$this->appDir = $appDir;
 		} else {
-			throw new Exception('Application directory not found or not readable!');
+			throw new SA_DirNotFound_Exception('Application directory not found or not readable!');
 		}
 		return $this;
 	}
@@ -55,19 +64,19 @@ abstract class SA_Application extends SA_Object {
 	public function &pageFactory($pageName = null) {
 		$pagesDir = $this->getApplicationDir() . 'pages/';
 		if (!is_dir($pagesDir) || !is_readable($pagesDir)) {
-			throw new Exception('Pages directory not found or not readable!');
+			throw new SA_DirNotFound_Exception('Pages directory not found or not readable!');
 		}
 		$p = $this->request->get(self::PAGE_VAR_NAME);
 		$pageName = strtolower(is_null($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName);
 		$pageFileName = "{$pagesDir}{$pageName}.php";
 		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
-			throw new Exception("File $pageFileName not found!");
+			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
 		}
 		require_once $pageFileName;
 		$className = "Page_$pageName";
 		$page = new $className($this->request, $this->response);
 		if (!is_a($page, 'SA_IPage')) {
-			throw new Exception("Class $className must implement SA_IPage interface!");
+			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
 		}
 		return $page;
 	}
