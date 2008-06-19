@@ -1,6 +1,6 @@
 <?php
 /**
- * © 2008 Petre Trînculescu <andi@skyweb.ro>
+ * © 2008 Petre Trînculescu <petre@skyweb.ro>
  * @author Petre Trînculescu
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files
@@ -21,6 +21,7 @@
 interface SA_IPage {
 	public function setPageName($name);
 	public function getPageName();
+	public function init();
 	public function get();
 	public function post();
 	public function &content($content = null);

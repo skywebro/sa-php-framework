@@ -1,6 +1,6 @@
 <?php
 /**
- * © 2008 Petre Trînculescu <andi@skyweb.ro>
+ * © 2008 Petre Trînculescu <petre@skyweb.ro>
  * @author Petre Trînculescu
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files
@@ -87,6 +87,7 @@ abstract class SA_Application extends SA_Object {
 	public function run($sendHeaders = true) {
 		try {
 			$this->pageFactory();
+			$this->page->init();
 			if ($this->request->isGet()) {
 				$this->page->get();
 			} elseif ($this->request->isPost()) {
