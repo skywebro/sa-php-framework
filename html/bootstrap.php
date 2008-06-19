@@ -19,6 +19,7 @@
  */
 
 define('BASE_DIR', dirname(__FILE__) . '/../');
+define('SMARTY_DIR', BASE_DIR . 'smarty/');
 
 require_once BASE_DIR . 'sa/SA.php';
 spl_autoload_register('SA::autoload');
