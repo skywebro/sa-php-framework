@@ -20,17 +20,21 @@
 
 require_once SMARTY_DIR . 'Smarty.class.php';
 
-class SA_SmartyPage extends SA_Page {
+abstract class SA_SmartyPage extends SA_Page {
 	protected $smarty = null;
 	protected $template = null;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
 		parent::__construct($request, $response);
-		$app = SA_Application::singleton();
 		$this->smarty = new Smarty;
 		$this->smarty->use_sub_dirs = true;
+		$app = SA_Application::singleton();
 		$this->smarty->template_dir = $app->getApplicationDir() . 'templates/';
 		$this->smarty->compile_dir = $app->getApplicationDir() . 'templates_c/';
+	}
+
+	public function assign($key, $value = null) {
+		$this->smarty->assign($key, $value);
 	}
 
 	public function setPageName($name) {
@@ -39,7 +43,7 @@ class SA_SmartyPage extends SA_Page {
 	}
 
 	public function setTemplate($template = null) {
-		$this->template = is_null($template) ? "{$this->name}.tpl" : $template;
+		$this->template = is_null($template) ? $this->getPageName() . '.tpl' : $template;
 	}
 
 	public function getTemplate($template) {
@@ -47,10 +51,6 @@ class SA_SmartyPage extends SA_Page {
 	}
 
 	public function &content($content = null) {
-		return $this->smarty->fetch($this->template);
-	}
-
-	public function display() {
-		$this->smarty->display($this->template);
+		return parent::content($this->smarty->fetch($this->template));
 	}
 }
