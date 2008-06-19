@@ -1,6 +1,6 @@
 <?php
 /**
- * © 2008 Petre Trînculescu <andi@skyweb.ro>
+ * © 2008 Petre Trînculescu <petre@skyweb.ro>
  * @author Petre Trînculescu
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files
@@ -18,8 +18,16 @@
  * $Id$
  */
 
-class Page_Index extends SA_SmartyPage {
+class Page_InDex extends SA_SmartyPage {
+	public function init() {
+		$this->assign('msg', 'in smarty page index');
+	}
+
 	public function get() {
-		$this->assign('msg', 'in index page from template');
+		$this->assign('get_msg', 'i am coming from the get method');
+	}
+
+	public function post() {
+		$this->assign('post_msg', 'i am coming from the post method');
 	}
 }
