@@ -23,7 +23,7 @@ require_once 'SA_Object.php';
 class SA extends SA_Object {
 	public static function autoload($className) {
 		if (preg_match('/^SA_/', $className)) {
-			require_once BASE_DIR . "sa/{$className}.php";
+			require_once BASE_DIR . "/sa/{$className}.php";
 		}
 	}
 }

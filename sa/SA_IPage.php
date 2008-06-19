@@ -18,6 +18,7 @@
  * $Id$
  */
 
-abstract class SA_Object {
-	public function __construct() {}
+interface SA_IPage {
+	public function &content($content = null);
+	public function display();
 }

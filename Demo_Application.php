@@ -20,9 +20,6 @@
 
 class Demo_Application extends SA_Application {
 	public function run() {
-		$body = &$this->response->body();
-		$body = 'utf-8 demo: ăîâșț';
-
 		parent::run();
 	}
 }

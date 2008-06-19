@@ -18,6 +18,9 @@
  * $Id$
  */
 
-abstract class SA_Object {
-	public function __construct() {}
+class Page_index extends SA_Page {
+	public function &content($content = null) {
+		$body = &$this->response->body();
+		$body = 'in index page';
+	}
 }
