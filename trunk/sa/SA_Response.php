@@ -23,19 +23,20 @@ class SA_Response extends SA_Object {
 	protected $body = null;
 
 	public function __construct() {
+		parent::__construct();
 		$this->headers = new ArrayObject();
 		$this->headers['Content-type'] = 'text/html; charset=utf-8';
 	}
 
-	public function &headers($name = null, $value = null) {
+	public function &headers($key = null, $value = null) {
 		$result = null;
-		if (is_null($name)) {
+		if (is_null($key)) {
 			$result = &$this->headers;
 		} elseif (is_null($value)) {
-			$result = &$this->headers[$name];
+			$result = &$this->headers[$key];
 		} else {
-			$result = &$this->headers[$name];
-			$this->headers[$name] = $value;
+			$result = &$this->headers[$key];
+			$this->headers[$key] = $value;
 		}
 		return $result;
 	}

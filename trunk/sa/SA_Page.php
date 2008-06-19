@@ -18,6 +18,24 @@
  * $Id$
  */
 
-abstract class SA_Object {
-	public function __construct() {}
+abstract class SA_Page extends SA_Object implements SA_IPage {
+	protected $request;
+	protected $response;
+	protected $content = null;
+
+	public function __construct(SA_Request $request, SA_Response $response) {
+		parent::__construct();
+
+		$this->request = $request;
+		$this->response = $response;
+	}
+
+	public function &content($content = null) {
+		if (!is_null($content)) $this->content = $content;
+		return $this->body;
+	}
+
+	public function display() {
+		print $this->content();
+	}
 }

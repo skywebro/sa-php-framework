@@ -20,5 +20,9 @@
 
 require_once 'bootstrap.php';
 
-$demo = new Demo_Application();
-$demo->run();
+try {
+	$demo = new Demo_Application();
+	$demo->setApplicationDir(BASE_DIR . 'app/')->run();
+} catch (Exception $e) {
+	print 'ERROR: ' . $e->getMessage();
+}

@@ -25,36 +25,49 @@ class SA_Request extends SA_Object {
 	protected $get = null;
 	protected $post = null;
 	protected $cookies = null;
+	protected $server = null;
+	protected $env = null;
 
 	public function __construct() {
+		parent::__construct();
 		$this->get = new ArrayObject($_GET);
 		$this->post = new ArrayObject($_POST);
 		$this->cookies = new ArrayObject($_COOKIE);
+		$this->server = new ArrayObject($_SERVER);
+		$this->env = new ArrayObject($_ENV);
 	}
 
-	public function &get($name = null) {
-		return is_null($name) ? $this->get : $this->get[$name];
+	public function &get($key = null) {
+		return is_null($key) ? $this->get : $this->get[$key];
 	}
 
-	public function &post($name = null) {
-		return is_null($name) ? $this->post : $this->post[$name];
+	public function &post($key = null) {
+		return is_null($key) ? $this->post : $this->post[$key];
 	}
 
-	public function &cookie($name = null) {
-		return is_null($name) ? $this->cookies : $this->cookies[$name];
+	public function &cookie($key = null) {
+		return is_null($key) ? $this->cookies : $this->cookies[$key];
+	}
+
+	public function &server($key = null) {
+		return is_null($key) ? $this->server : $this->server[$key];
+	}
+
+	public function &env($key = null) {
+		return is_null($key) ? $this->env : $this->env[$key];
 	}
 
 	public function isGet() {
-		return strcasecmp($_SERVER['REQUEST_METHOD'], self::REQUEST_METHOD_GET) == 0;
+		return strcasecmp($this->server('REQUEST_METHOD'), self::REQUEST_METHOD_GET) == 0;
 	}
 
 	public function isPost() {
-		return strcasecmp($_SERVER['REQUEST_METHOD'], self::REQUEST_METHOD_POST) == 0;
+		return strcasecmp($this->server('REQUEST_METHOD'), self::REQUEST_METHOD_POST) == 0;
 	}
 
 	public function isAjax() {
 		//this implementation works for jQuery style Ajax requests
-		$ajaxHeader = $_SERVER['HTTP_X_REQUESTED_WITH'];
+		$ajaxHeader = $this->server('HTTP_X_REQUESTED_WITH');
 		if (empty($ajaxHeader) && function_exists('apache_request_headers')) {
 			$apacheHeaders = array_change_key_case(apache_request_headers(), CASE_LOWER);
 			$ajaxHeader = $apacheHeaders['x-requested-with'];
