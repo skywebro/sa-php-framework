@@ -73,7 +73,7 @@ abstract class SA_Application extends SA_Object {
 			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
 		}
 		require_once $pageFileName;
-		$className = "Page_$pageName";
+		$className = 'Page_' . ucfirst($pageName);
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
 		}

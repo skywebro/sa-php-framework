@@ -18,8 +18,8 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
+class Page_Index extends SA_SmartyPage {
 	public function get() {
-		$this->smarty->assign('msg', 'in index page from template');
+		$this->assign('msg', 'in index page from template');
 	}
 }
