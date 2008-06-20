@@ -50,9 +50,9 @@ abstract class SA_Application extends SA_Object {
 	public function getXMLPageMap() {
 		static $xml;
 
-		if (isset($xml)) return $xml;
-
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
+		if (DEBUG === true) $cache->expire();
+		elseif (isset($xml)) return $xml;
 		$xmlString = $cache->load();
 		if ($xmlString) {
 			$xml = new SimpleXMLElement($xmlString);
@@ -61,7 +61,6 @@ abstract class SA_Application extends SA_Object {
 			$this->xmlFileSystem($this->getPagesDir(), $xml);
 			$cache->save($xml->asXML());
 		}
-
 		return $xml;
 	}
 
@@ -145,7 +144,7 @@ abstract class SA_Application extends SA_Object {
 		$pagePath = dirname($p) . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
-		@require_once $pageFileName;
+		@include_once $pageFileName;
 		$className = "Page_$pageName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
@@ -163,7 +162,7 @@ abstract class SA_Application extends SA_Object {
 		$layout = null;
 		$layoutPath = $this->getLayoutsDir();
 		$layoutFileName = "{$layoutPath}{$layoutName}.php";
-		@require_once $layoutFileName;
+		@include_once $layoutFileName;
 		$className = "Layout_$layoutName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
