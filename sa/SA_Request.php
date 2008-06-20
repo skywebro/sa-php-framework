@@ -104,27 +104,23 @@ class SA_Request extends SA_Object {
 			if ((substr($xpath = $partialPathInfo, -1) == '/') && is_array($entries = $xml->xpath(fileXPath($pathInfoStack, 'dir'))) && count($entries)) {
 				$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
 			} elseif (is_array($entries = $xml->xpath(fileXPath($pathInfoStack, 'file'))) && count($entries)) {
-				$pageName = rtrim($partialPathInfo, '/');
+				$pageName = trim($partialPathInfo, '/');
 			}
 			if ($pageName) break;
 			array_pop($pathInfoStack);
 		}
-		$pageName = preg_replace('/[^a-z0-9_\/]/i', '_', $pageName);
-		$matches = array();
-		$pattern = str_replace('/', '\/', is_null($pageName) ? "^(.*)$" : "^$pageName/(.*)$");
-		preg_match("/$pattern/", $pathInfo, $matches);
-		$params = array_filter(explode('/', $matches[1]), create_function('$value', 'return trim(urldecode($value)) !== "";'));
+		$params = array_filter(explode('/', trim(substr($pathInfo, strlen($pageName)), '/')), create_function('$value', 'return trim(urldecode($value)) !== "";'));
 		if (count($params) % 2) throw new SA_NoPage_Exception('Page not found');
 		for($i = 0; $i < count($params); $i += 2) {
 			$key = trim(urldecode($params[$i]));
 			$value = trim(urldecode($params[$i + 1]));
 			if (!empty($key)) $_REQUEST[$key] = $_GET[$key] = $value;
 		}
-		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = urldecode($pageName);
+		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = preg_replace('/[^a-z0-9_\/]/i', '_', urldecode($pageName));
 	}
 
 	public function isAjax() {
-		//this implementation works for jQuery style Ajax requests
+		//this check works for jQuery style Ajax requests
 		$ajaxHeader = $this->server('HTTP_X_REQUESTED_WITH');
 		if (empty($ajaxHeader) && function_exists('apache_request_headers')) {
 			$apacheHeaders = array_change_key_case(apache_request_headers(), CASE_LOWER);

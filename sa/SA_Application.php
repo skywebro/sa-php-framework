@@ -44,6 +44,7 @@ abstract class SA_Application extends SA_Object {
 		$this->response = new SA_Response();
 
 		session_name(self::SESSION_NAME);
+		if ($sid = $this->request->request(self::SESSION_NAME)) session_id($sid);
 		session_start();
 	}
 
