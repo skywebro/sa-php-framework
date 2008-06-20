@@ -22,6 +22,7 @@ abstract class SA_Page extends SA_Object implements SA_IPage {
 	protected $request = null;
 	protected $response = null;
 	protected $name = null;
+	protected $path = null;
 	protected $content = null;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
@@ -37,6 +38,14 @@ abstract class SA_Page extends SA_Object implements SA_IPage {
 
 	public function getPageName() {
 		return $this->name;
+	}
+
+	public function setPagePath($path) {
+		$this->path = $path;
+	}
+
+	public function getPagePath() {
+		return $this->path;
 	}
 
 	public function &headers($key = null, $value = null) {

@@ -21,6 +21,8 @@
 interface SA_IPage {
 	public function setPageName($name);
 	public function getPageName();
+	public function setPagePath($path);
+	public function getPagePath();
 	public function init();
 	public function get();
 	public function post();

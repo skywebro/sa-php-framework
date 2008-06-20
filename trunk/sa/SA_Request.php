@@ -86,11 +86,11 @@ class SA_Request extends SA_Object {
 			array_pop($pathInfoStack);
 		}
 		$matches = array();
-		$pattern = str_replace('/', '\/', is_null($pageName) ? "^$pageName(.*)$" : "^$pageName/(.*)$");
+		$pattern = str_replace('/', '\/', is_null($pageName) ? "^(.*)$" : "^$pageName/(.*)$");
 		preg_match("/$pattern/", substr($_SERVER['PATH_INFO'], 1), $matches);
 		$params = explode('/', $matches[1]);
 		for($i = 0; $i < count($params); $i += 2) {
-			if (!empty($params[$i])) $_REQUEST[$params[$i]] = $_GET[$params[$i]] = $params[$i + 1];
+			if (!empty($params[$i])) $_REQUEST[$params[$i]] = $_GET[$params[$i]] = urldecode($params[$i + 1]);
 		}
 		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
 	}
