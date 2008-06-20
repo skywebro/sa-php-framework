@@ -18,4 +18,4 @@
  * $Id$
  */
 
-class SA_PageInterface_Exception extends SA_Exception {}
+class Layout_default extends SA_Layout {}

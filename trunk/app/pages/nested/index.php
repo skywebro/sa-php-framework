@@ -18,7 +18,7 @@
  * $Id$
  */
 
-class Page_Index extends SA_SmartyPage {
+class Page_index extends SA_SmartyPage {
 	protected $withoutTemplate = true;
 
 	public function get() {

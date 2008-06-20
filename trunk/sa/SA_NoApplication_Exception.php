@@ -18,4 +18,4 @@
  * $Id$
  */
 
-class SA_NoApplication_Exception extends Exception {}
+class SA_NoApplication_Exception extends SA_Exception {}

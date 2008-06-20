@@ -23,6 +23,7 @@ require_once SMARTY_DIR . 'Smarty.class.php';
 abstract class SA_SmartyPage extends SA_Page {
 	protected $smarty = null;
 	protected $template = '';
+	protected $layout = null;
 	protected $withoutTemplate = false;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
@@ -30,9 +31,14 @@ abstract class SA_SmartyPage extends SA_Page {
 		$this->smarty = new Smarty;
 		$this->smarty->use_sub_dirs = true;
 		$app = SA_Application::singleton();
-		$this->smarty->template_dir = $app->getApplicationDir() . 'templates/';
-		$this->smarty->compile_dir = $app->getApplicationDir() . 'templates_c/';
+		$this->smarty->template_dir = $app->getTemplatesDir();
+		$this->smarty->compile_dir = $app->getCompileDir();
 		$this->smarty->compile_id = md5($this->smarty->template_dir);
+		$this->smarty->assign_by_ref('__PAGE__', $this);
+	}
+
+	public function &getSmarty() {
+		return $this->smarty;
 	}
 
 	public function assign($key, $value = null) {
@@ -50,7 +56,7 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function setPagePath($path) {
 		parent::setPagePath($path);
-		$this->smarty->template_dir = SA_Application::singleton()->getApplicationDir() . 'templates/' . $path;
+		$this->smarty->template_dir = SA_Application::singleton()->getTemplatesDir() . $path;
 		$this->smarty->compile_id = md5($this->smarty->template_dir);
 	}
 
@@ -68,8 +74,30 @@ abstract class SA_SmartyPage extends SA_Page {
 		return $this->template;
 	}
 
+	public function setLayout($layoutName = null) {
+		return $this->layout = is_null($layoutName) ? null : SA_Application::singleton()->layoutFactory($layoutName);
+	}
+
+	public function hasLayout() {
+		return !is_null($this->layout) && is_a($this->layout, 'SA_Layout');
+	}
+
+	public function &getLayout() {
+		return $this->layout;
+	}
+
+	public function fetch($template = null) {
+		$template = is_null($template) ? $this->template : $template;
+		if (!$this->smarty->template_exists($template)) throw new SA_FileNotFound_Exception($this->getPageName() . ' template does not exist.');
+		return $this->smarty->fetch($template);
+	}
+
 	public function &content($content = null) {
-		$content = $this->isWithoutTemplate() ? null : $this->smarty->fetch($this->template);
+		$content = $this->isWithoutTemplate() ? null : $this->fetch();
+		if ($this->hasLayout()) {
+			$this->layout->assign('__CONTENT_FOR_LAYOUT__', $content);
+			$content = $this->layout->fetch();
+		}
 		return parent::content($content);
 	}
 }

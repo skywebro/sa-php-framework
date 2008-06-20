@@ -18,4 +18,4 @@
  * $Id$
  */
 
-class SA_PageInterface_Exception extends SA_Exception {}
+class SA_Layout extends SA_SmartyPage {}

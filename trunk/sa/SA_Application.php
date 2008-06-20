@@ -27,6 +27,9 @@ abstract class SA_Application extends SA_Object {
 	protected $response = null;
 	protected $appDir = null;
 	protected $pagesDir = null;
+	protected $layoutsDir = null;
+	protected $templatesDir = null;
+	protected $compileDir = null;
 	protected static $instance = null;
 
 	public function __construct($appDir) {
@@ -59,6 +62,9 @@ abstract class SA_Application extends SA_Object {
 		if (is_dir($appDir) && is_readable($appDir)) {
 			$this->appDir = $appDir;
 			$this->setPagesDir($appDir . 'pages/');
+			$this->setLayoutsDir($appDir . 'layouts/');
+			$this->setTemplatesDir($appDir . 'templates/');
+			$this->setCompileDir($appDir . 'templates_c/');
 		} else {
 			throw new SA_DirNotFound_Exception('Application directory not found or not readable!');
 		}
@@ -81,6 +87,42 @@ abstract class SA_Application extends SA_Object {
 		return $this->pagesDir;
 	}
 
+	public function setLayoutsDir($layoutsDir) {
+		if (is_dir($layoutsDir) && is_readable($layoutsDir)) {
+			$this->layoutsDir = $layoutsDir;
+		} else {
+			throw new SA_DirNotFound_Exception('Layouts directory not found or not readable!');
+		}
+	}
+
+	public function getLayoutsDir() {
+		return $this->layoutsDir;
+	}
+
+	public function setTemplatesDir($templatesDir) {
+		if (is_dir($templatesDir) && is_readable($templatesDir)) {
+			$this->templatesDir = $templatesDir;
+		} else {
+			throw new SA_DirNotFound_Exception('Templates directory not found or not readable!');
+		}
+	}
+
+	public function getTemplatesDir() {
+		return $this->templatesDir;
+	}
+
+	public function setCompileDir($compileDir) {
+		if (is_dir($compileDir) && is_readable($compileDir) && is_writable($compileDir)) {
+			$this->compileDir = $compileDir;
+		} else {
+			throw new SA_DirNotFound_Exception('Compile directory not found or not readable/writable!');
+		}
+	}
+
+	public function getCompileDir() {
+		return $this->compileDir;
+	}
+
 	public function &pageFactory($pageName = null) {
 		$p = $this->request->get(self::PAGE_VAR_NAME);
 		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
@@ -89,10 +131,10 @@ abstract class SA_Application extends SA_Object {
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
 		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
-			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
+			throw new SA_FileNotFound_Exception("File $pageFileName not found or not readable!");
 		}
 		require_once $pageFileName;
-		$className = 'Page_' . $pageName;
+		$className = "Page_$pageName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
 		}
@@ -103,6 +145,26 @@ abstract class SA_Application extends SA_Object {
 		$this->page->setPagePath($pagePath);
 		$this->page->setPageName($pageName);
 		return $this->page;
+	}
+
+	public function &layoutFactory($layoutName) {
+		$layout = null;
+		$layoutPath = $this->getLayoutsDir();
+		$layoutFileName = "{$layoutPath}{$layoutName}.php";
+		if (!is_file($layoutFileName) || !is_readable($layoutFileName)) {
+			throw new SA_FileNotFound_Exception("Layout $layoutFileName not found or not readable!");
+		}
+		require_once $layoutFileName;
+		$className = "Layout_$layoutName";
+		if (!class_exists($className)) {
+			throw new SA_PageInterface_Exception("Class $className does not exist!");
+		}
+		$layout = new $className($this->request, $this->response);
+		$smarty = $layout->getSmarty();
+		$smarty->template_dir = $this->getTemplatesDir() . 'layouts/';
+		$smarty->compile_id = md5($smarty->template_dir);
+		$layout->setPageName($layoutName);
+		return $layout;
 	}
 
 	public function error(Exception $e) {
