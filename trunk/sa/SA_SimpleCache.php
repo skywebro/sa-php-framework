@@ -52,12 +52,12 @@ class SA_DiskCache extends SA_Object {
 		return $this->data = @file_get_contents($this->fileName);
 	}
 
-	public function expire() {
-		@unlink($this->fileName);
-	}
-
 	public function save($data = null) {
 		$this->data = is_null($data) ? $this->data : $data;
 		return @file_put_contents($this->fileName, $this->data, LOCK_EX);
+	}
+
+	public function expire() {
+		@unlink($this->fileName);
 	}
 }

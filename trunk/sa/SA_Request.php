@@ -109,7 +109,7 @@ class SA_Request extends SA_Object {
 			if ($pageName) break;
 			array_pop($pathInfoStack);
 		}
-
+		$pageName = preg_replace('/[^a-z0-9_\/]/i', '_', $pageName);
 		$matches = array();
 		$pattern = str_replace('/', '\/', is_null($pageName) ? "^(.*)$" : "^$pageName/(.*)$");
 		preg_match("/$pattern/", $pathInfo, $matches);
