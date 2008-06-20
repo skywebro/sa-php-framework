@@ -18,6 +18,7 @@
  * $Id$
  */
 
+define('DEBUG', true);
 define('BASE_DIR', dirname(__FILE__) . '/../');
 define('SMARTY_DIR', BASE_DIR . 'smarty/');
 

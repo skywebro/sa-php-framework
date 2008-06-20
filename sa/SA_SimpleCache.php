@@ -35,6 +35,7 @@ class SA_DiskCache extends SA_Object {
 	protected $data;
 
 	public function __construct($id) {
+		parent::__construct();
 		$this->id = $id;
 		$this->fileName = SA_Application::singleton()->getCacheDir() . md5(SA_Application::SECRET . $id . SA_Application::SECRET);
 	}
@@ -49,6 +50,10 @@ class SA_DiskCache extends SA_Object {
 
 	public function load() {
 		return $this->data = @file_get_contents($this->fileName);
+	}
+
+	public function expire() {
+		@unlink($this->fileName);
 	}
 
 	public function save($data = null) {
