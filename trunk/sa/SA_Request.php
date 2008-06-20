@@ -79,10 +79,12 @@ class SA_Request extends SA_Object {
 		$pageName = $partialPathInfo = null;
 		for($i = 0; $i < count($pathInfo); $i++) {
 			$partialPathInfo = implode('/', $pathInfoStack);
-			if (is_file($file = $pagesDir . $partialPathInfo . '.php')) {
+			if ((substr($partialPathInfo, -1) == '/') && is_file($pagesDir . $partialPathInfo . SA_Application::DEFAULT_PAGE . '.php')) {
+				$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
+			} elseif (is_file($pagesDir . $partialPathInfo . '.php')) {
 				$pageName = $partialPathInfo;
-				break;
 			}
+			if ($pageName) break;
 			array_pop($pathInfoStack);
 		}
 		$matches = array();

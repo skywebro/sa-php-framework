@@ -24,7 +24,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	protected $smarty = null;
 	protected $template = '';
 	protected $layout = null;
-	protected $withoutTemplate = false;
+	protected $hasTemplate = true;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
 		parent::__construct($request, $response);
@@ -45,13 +45,13 @@ abstract class SA_SmartyPage extends SA_Page {
 		$this->smarty->assign($key, $value);
 	}
 
-	public function isWithoutTemplate() {
-		return ($this->withoutTemplate == true) || (is_null($this->template));
+	public function hasTemplate() {
+		return ($this->hasTemplate == true) && (!is_null($this->template));
 	}
 
 	public function setPageName($name) {
 		parent::setPageName($name);
-		$this->setTemplate($this->isWithoutTemplate() ? null : "$name.tpl");
+		$this->setTemplate($this->hasTemplate() ? "$name.tpl" : null);
 	}
 
 	public function setPagePath($path) {
@@ -93,7 +93,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function &content($content = null) {
-		$content = $this->isWithoutTemplate() ? null : $this->fetch();
+		$content = $this->hasTemplate() ? $this->fetch() : null;
 		if ($this->hasLayout()) {
 			$this->layout->assign('__CONTENT_FOR_LAYOUT__', $content);
 			$content = $this->layout->fetch();

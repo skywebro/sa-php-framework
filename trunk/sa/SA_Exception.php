@@ -20,7 +20,7 @@
 
 class SA_Exception extends Exception {
 	public function __construct($message = null, $code = 0) {
-		$message = "<div><span style='color:red;'><b>ERROR</b>:</span>&nbsp;$message</div>";
+		$message = "<div style='color:red;font-weight:bold;'>ERROR:&nbsp;$message</div>";
 		parent::__construct($message, $code);
 	}
 }
