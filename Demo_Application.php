@@ -19,7 +19,8 @@
  */
 
 class Demo_Application extends SA_Application {
-	public function run() {
-		parent::run();
+	public function error(Exception $e) {
+		print '<div style="font-family:arial,helvetica,serif;font-size:12px;font-weight:bold">' . __CLASS__ . ': in error handler (do what you have to do)' . '</div>';
+		throw $e;
 	}
 }

@@ -25,5 +25,5 @@ try {
 	$demo = new Demo_Application(BASE_DIR . 'app/');
 	$demo->run();
 } catch (Exception $e) {
-	print '<div style="font-family:arial,helvetica,serif;font-size:12px;background-color:black;color:lime;padding:5px;border:3px solid red;">' . nl2br($e) . '</div>';
+	pretty_error($e);
 }
