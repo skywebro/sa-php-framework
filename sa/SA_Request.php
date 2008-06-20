@@ -74,27 +74,53 @@ class SA_Request extends SA_Object {
 	}
 
 	public function detectParameters() {
-		$pathInfoStack = $pathInfo = explode('/', substr($_SERVER['PATH_INFO'], 1));
-		$pagesDir = SA_Application::singleton()->getPagesDir();
+		$pathInfo = substr($_SERVER['PATH_INFO'], strpos($_SERVER['PATH_INFO'], '/') + 1);
+		$pathInfoStack = $pathInfoArray = explode('/', $pathInfo);
 		$pageName = $partialPathInfo = null;
-		for($i = 0; $i < count($pathInfo); $i++) {
+
+		function fileXPath($pathInfo, $type) {
+			if (!is_array($pathInfo)) return null;
+			$pathInfo = array_filter($pathInfo, create_function('$value', 'return trim(urldecode($value)) !== "";'));
+			$xpath = array('//dirs');
+			if ($type == 'file') $fileName = preg_replace('/[^a-z0-9_\/]/i', '_', array_pop($pathInfo));
+			foreach($pathInfo as $value) {
+				if (!empty($value)) {
+					$value = preg_replace('/[^a-z0-9_\/]/i', '_', $value);
+					$xpath[] = "dir[@name='$value']";
+				}
+			}
+			if ($type == 'dir') {
+				$xpath[] = "file[@name='" . SA_Application::DEFAULT_PAGE . ".php']";
+			} elseif ($type == 'file') {
+				$xpath[] = "file[@name='{$fileName}.php']";
+			}
+			$xPathString = implode('/', $xpath);
+			return $xPathString;
+		}
+
+		$xml = SA_Application::singleton()->getXMLPageMap();
+		for($i = 0; $i < count($pathInfoArray); $i++) {
 			$partialPathInfo = implode('/', $pathInfoStack);
-			if ((substr($partialPathInfo, -1) == '/') && is_file($pagesDir . $partialPathInfo . SA_Application::DEFAULT_PAGE . '.php')) {
+			if ((substr($xpath = $partialPathInfo, -1) == '/') && is_array($entries = $xml->xpath(fileXPath($pathInfoStack, 'dir'))) && count($entries)) {
 				$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
-			} elseif (is_file($pagesDir . $partialPathInfo . '.php')) {
-				$pageName = $partialPathInfo;
+			} elseif (is_array($entries = $xml->xpath(fileXPath($pathInfoStack, 'file'))) && count($entries)) {
+				$pageName = rtrim($partialPathInfo, '/');
 			}
 			if ($pageName) break;
 			array_pop($pathInfoStack);
 		}
+
 		$matches = array();
 		$pattern = str_replace('/', '\/', is_null($pageName) ? "^(.*)$" : "^$pageName/(.*)$");
-		preg_match("/$pattern/", substr($_SERVER['PATH_INFO'], 1), $matches);
-		$params = explode('/', $matches[1]);
+		preg_match("/$pattern/", $pathInfo, $matches);
+		$params = array_filter(explode('/', $matches[1]), create_function('$value', 'return trim(urldecode($value)) !== "";'));
+		if (count($params) % 2) throw new SA_NoPage_Exception('Page not found');
 		for($i = 0; $i < count($params); $i += 2) {
-			if (!empty($params[$i])) $_REQUEST[$params[$i]] = $_GET[$params[$i]] = urldecode($params[$i + 1]);
+			$key = trim(urldecode($params[$i]));
+			$value = trim(urldecode($params[$i + 1]));
+			if (!empty($key)) $_REQUEST[$key] = $_GET[$key] = $value;
 		}
-		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
+		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = urldecode($pageName);
 	}
 
 	public function isAjax() {

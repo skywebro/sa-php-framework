@@ -22,6 +22,7 @@ abstract class SA_Application extends SA_Object {
 	const PAGE_VAR_NAME = '__SA_PAGE__';
 	const DEFAULT_PAGE = 'index';
 	const SESSION_NAME = 'SASESSID';
+	const SECRET = 'alAb4laPor70cAla';
 
 	protected $request = null;
 	protected $response = null;
@@ -30,6 +31,7 @@ abstract class SA_Application extends SA_Object {
 	protected $layoutsDir = null;
 	protected $templatesDir = null;
 	protected $compileDir = null;
+	protected $cacheDir = null;
 	protected static $instance = null;
 
 	public function __construct($appDir) {
@@ -37,10 +39,30 @@ abstract class SA_Application extends SA_Object {
 
 		$this->setApplicationDir($appDir);
 		self::$instance = &$this;
+
 		$this->request = new SA_Request();
 		$this->response = new SA_Response();
+
 		session_name(self::SESSION_NAME);
 		session_start();
+	}
+
+	public function getXMLPageMap() {
+		static $xml;
+
+		if (isset($xml)) return $xml;
+
+		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
+		$xmlString = $cache->load();
+		if ($xmlString) {
+			$xml = new SimpleXMLElement($xmlString);
+		} else {
+			$xml = new SimpleXMLElement("<?xml version='1.0' standalone='yes'?><dirs/>");
+			$this->xmlFileSystem($this->getPagesDir(), $xml);
+			$cache->save($xml->asXML());
+		}
+
+		return $xml;
 	}
 
 	public static function &singleton() {
@@ -61,6 +83,7 @@ abstract class SA_Application extends SA_Object {
 	public function setApplicationDir($appDir) {
 		if (is_dir($appDir) && is_readable($appDir)) {
 			$this->appDir = $appDir;
+			$this->setCacheDir($appDir . 'cache/');
 			$this->setPagesDir($appDir . 'pages/');
 			$this->setLayoutsDir($appDir . 'layouts/');
 			$this->setTemplatesDir($appDir . 'templates/');
@@ -76,11 +99,7 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function setPagesDir($pagesDir) {
-		if (is_dir($pagesDir) && is_readable($pagesDir)) {
-			$this->pagesDir = $pagesDir;
-		} else {
-			throw new SA_DirNotFound_Exception('Pages directory not found or not readable!');
-		}
+		$this->pagesDir = $pagesDir;
 	}
 
 	public function getPagesDir() {
@@ -88,11 +107,7 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function setLayoutsDir($layoutsDir) {
-		if (is_dir($layoutsDir) && is_readable($layoutsDir)) {
-			$this->layoutsDir = $layoutsDir;
-		} else {
-			throw new SA_DirNotFound_Exception('Layouts directory not found or not readable!');
-		}
+		$this->layoutsDir = $layoutsDir;
 	}
 
 	public function getLayoutsDir() {
@@ -100,11 +115,7 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function setTemplatesDir($templatesDir) {
-		if (is_dir($templatesDir) && is_readable($templatesDir)) {
-			$this->templatesDir = $templatesDir;
-		} else {
-			throw new SA_DirNotFound_Exception('Templates directory not found or not readable!');
-		}
+		$this->templatesDir = $templatesDir;
 	}
 
 	public function getTemplatesDir() {
@@ -112,15 +123,19 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function setCompileDir($compileDir) {
-		if (is_dir($compileDir) && is_readable($compileDir) && is_writable($compileDir)) {
-			$this->compileDir = $compileDir;
-		} else {
-			throw new SA_DirNotFound_Exception('Compile directory not found or not readable/writable!');
-		}
+		$this->compileDir = $compileDir;
 	}
 
 	public function getCompileDir() {
 		return $this->compileDir;
+	}
+
+	public function setCacheDir($cacheDir) {
+		$this->cacheDir = $cacheDir;
+	}
+
+	public function getCacheDir() {
+		return $this->cacheDir;
 	}
 
 	public function &pageFactory($pageName = null) {
@@ -130,10 +145,7 @@ abstract class SA_Application extends SA_Object {
 		$pagePath = dirname($p) . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
-		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
-			throw new SA_FileNotFound_Exception("File $pageFileName not found or not readable!");
-		}
-		require_once $pageFileName;
+		@require_once $pageFileName;
 		$className = "Page_$pageName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
@@ -151,10 +163,7 @@ abstract class SA_Application extends SA_Object {
 		$layout = null;
 		$layoutPath = $this->getLayoutsDir();
 		$layoutFileName = "{$layoutPath}{$layoutName}.php";
-		if (!is_file($layoutFileName) || !is_readable($layoutFileName)) {
-			throw new SA_FileNotFound_Exception("Layout $layoutFileName not found or not readable!");
-		}
-		require_once $layoutFileName;
+		@require_once $layoutFileName;
 		$className = "Layout_$layoutName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
@@ -186,5 +195,24 @@ abstract class SA_Application extends SA_Object {
 		} catch(Exception $e) {
 			$this->error($e);
 		}
+	}
+
+	protected function xmlFileSystem($dirName, SimpleXMLElement $xml) {
+		try {
+			$dir = new DirectoryIterator($dirName);
+			foreach ($dir as $entry) {
+				$entryName = $entry->getFilename();
+				if ($entry->isDir()) {
+					if (!$entry->isDot()) {
+						$xmlDir = $xml->addChild('dir');
+						$xmlDir->addAttribute('name', $entryName);
+						$this->xmlFileSystem($dirName . '/' . $entryName, $xmlDir);
+					}
+				} else {
+					$xmlFile = $xml->addChild('file');
+					$xmlFile->addAttribute('name', $entryName);
+				}
+			}
+		} catch (Exception $e) {}
 	}
 }

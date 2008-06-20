@@ -61,13 +61,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function setTemplate($template = null) {
-		if (is_null($template)) {
-			$this->template = null;
-		} elseif ($this->smarty->template_exists($template)) {
-			$this->template = $template;
-		} else {
-			throw new SA_FileNotFound_Exception($this->getPageName() . ' template does not exist.');
-		}
+		$this->template = is_null($template) ? null : $template;
 	}
 
 	public function getTemplate($template) {
