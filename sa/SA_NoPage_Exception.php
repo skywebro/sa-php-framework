@@ -18,4 +18,4 @@
  * $Id$
  */
 
-class SA_NoPage_Exception extends Exception {}
+class SA_NoPage_Exception extends SA_Exception {}

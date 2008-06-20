@@ -18,4 +18,4 @@
  * $Id$
  */
 
-class SA_FileNotFound_Exception extends Exception {}
+class SA_FileNotFound_Exception extends SA_Exception {}

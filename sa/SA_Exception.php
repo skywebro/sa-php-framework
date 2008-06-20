@@ -18,4 +18,9 @@
  * $Id$
  */
 
-class SA_PageInterface_Exception extends SA_Exception {}
+class SA_Exception extends Exception {
+	public function __construct($message = null, $code = 0) {
+		$message = "<div><span style='color:red;'><b>ERROR</b>:</span>&nbsp;$message</div>";
+		parent::__construct($message, $code);
+	}
+}
