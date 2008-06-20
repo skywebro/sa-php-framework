@@ -82,23 +82,25 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function &pageFactory($pageName = null) {
-		$pagesDir = $this->getPagesDir();
 		$p = $this->request->get(self::PAGE_VAR_NAME);
 		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
 		$pageName = basename($p);
-		$pagePath = dirname($p);
+		$pagePath = dirname($p) . '/';
+		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
 		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
 			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
 		}
 		require_once $pageFileName;
-		$className = 'Page_' . ucfirst($pageName);
+		$className = 'Page_' . $pageName;
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
 		}
-		if (!in_array('SA_IPage', class_implements($this->page = new $className($this->request, $this->response)))) {
+		$this->page = new $className($this->request, $this->response);
+		if (!in_array('SA_IPage', class_implements($this->page))) {
 			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
 		}
+		$this->page->setPagePath($pagePath);
 		$this->page->setPageName($pageName);
 		return $this->page;
 	}
@@ -109,7 +111,7 @@ abstract class SA_Application extends SA_Object {
 
 	public function run($sendHeaders = true) {
 		try {
-			$page = $this->pageFactory($this->request->get(self::PAGE_VAR_NAME));
+			$page = $this->pageFactory();
 			$page->init();
 			if ($this->request->isGet()) {
 				$page->get();

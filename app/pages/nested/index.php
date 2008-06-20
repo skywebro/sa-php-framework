@@ -19,9 +19,7 @@
  */
 
 class Page_Index extends SA_SmartyPage {
-	public function init() {
-		$this->setTemplate(null);
-	}
+	protected $withoutTemplate = true;
 
 	public function get() {
 		print 'nested page without template';

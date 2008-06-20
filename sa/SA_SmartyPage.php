@@ -22,7 +22,8 @@ require_once SMARTY_DIR . 'Smarty.class.php';
 
 abstract class SA_SmartyPage extends SA_Page {
 	protected $smarty = null;
-	protected $template = null;
+	protected $template = '';
+	protected $withoutTemplate = false;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
 		parent::__construct($request, $response);
@@ -31,24 +32,35 @@ abstract class SA_SmartyPage extends SA_Page {
 		$app = SA_Application::singleton();
 		$this->smarty->template_dir = $app->getApplicationDir() . 'templates/';
 		$this->smarty->compile_dir = $app->getApplicationDir() . 'templates_c/';
+		$this->smarty->compile_id = md5($this->smarty->template_dir);
 	}
 
 	public function assign($key, $value = null) {
 		$this->smarty->assign($key, $value);
 	}
 
-	public function setPageName($name) {
-		parent::setPageName($name);
-		$this->setTemplate("$name.tpl");
+	public function isWithoutTemplate() {
+		return ($this->withoutTemplate == true) || (is_null($this->template));
 	}
 
-	public function setTemplate($template) {
+	public function setPageName($name) {
+		parent::setPageName($name);
+		$this->setTemplate($this->isWithoutTemplate() ? null : "$name.tpl");
+	}
+
+	public function setPagePath($path) {
+		parent::setPagePath($path);
+		$this->smarty->template_dir = SA_Application::singleton()->getApplicationDir() . 'templates/' . $path;
+		$this->smarty->compile_id = md5($this->smarty->template_dir);
+	}
+
+	public function setTemplate($template = null) {
 		if (is_null($template)) {
 			$this->template = null;
 		} elseif ($this->smarty->template_exists($template)) {
 			$this->template = $template;
 		} else {
-			throw new SA_FileNotFound_Exception($this->getPageName() . ' template does not exits.');
+			throw new SA_FileNotFound_Exception($this->getPageName() . ' template does not exist.');
 		}
 	}
 
@@ -57,7 +69,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function &content($content = null) {
-		$content = is_null($this->template) ? null : $this->smarty->fetch($this->template);
+		$content = $this->isWithoutTemplate() ? null : $this->smarty->fetch($this->template);
 		return parent::content($content);
 	}
 }
