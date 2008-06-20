@@ -39,11 +39,17 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function setPageName($name) {
 		parent::setPageName($name);
-		$this->setTemplate();
+		$this->setTemplate("$name.tpl");
 	}
 
-	public function setTemplate($template = null) {
-		$this->template = is_null($template) ? $this->getPageName() . '.tpl' : $template;
+	public function setTemplate($template) {
+		if (is_null($template)) {
+			$this->template = null;
+		} elseif ($this->smarty->template_exists($template)) {
+			$this->template = $template;
+		} else {
+			throw new SA_FileNotFound_Exception($this->getPageName() . ' template does not exits.');
+		}
 	}
 
 	public function getTemplate($template) {
@@ -51,6 +57,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function &content($content = null) {
-		return parent::content($this->smarty->fetch($this->template));
+		$content = is_null($this->template) ? null : $this->smarty->fetch($this->template);
+		return parent::content($content);
 	}
 }

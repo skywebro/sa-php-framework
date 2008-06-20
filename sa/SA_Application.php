@@ -19,18 +19,25 @@
  */
 
 abstract class SA_Application extends SA_Object {
-	const PAGE_VAR_NAME = 'p';
+	const PAGE_VAR_NAME = '__SA_PAGE__';
 	const DEFAULT_PAGE = 'index';
+	const SESSION_NAME = 'SASESSID';
+
 	protected $request = null;
 	protected $response = null;
 	protected $appDir = null;
+	protected $pagesDir = null;
 	protected static $instance = null;
 
-	public function __construct() {
+	public function __construct($appDir) {
 		parent::__construct();
+
+		$this->setApplicationDir($appDir);
+		self::$instance = &$this;
 		$this->request = new SA_Request();
 		$this->response = new SA_Response();
-		self::$instance = &$this;
+		session_name(self::SESSION_NAME);
+		session_start();
 	}
 
 	public static function &singleton() {
@@ -51,6 +58,7 @@ abstract class SA_Application extends SA_Object {
 	public function setApplicationDir($appDir) {
 		if (is_dir($appDir) && is_readable($appDir)) {
 			$this->appDir = $appDir;
+			$this->setPagesDir($appDir . 'pages/');
 		} else {
 			throw new SA_DirNotFound_Exception('Application directory not found or not readable!');
 		}
@@ -61,14 +69,25 @@ abstract class SA_Application extends SA_Object {
 		return $this->appDir;
 	}
 
-	public function &pageFactory($pageName = null) {
-		$pagesDir = $this->getApplicationDir() . 'pages/';
-		if (!is_dir($pagesDir) || !is_readable($pagesDir)) {
+	public function setPagesDir($pagesDir) {
+		if (is_dir($pagesDir) && is_readable($pagesDir)) {
+			$this->pagesDir = $pagesDir;
+		} else {
 			throw new SA_DirNotFound_Exception('Pages directory not found or not readable!');
 		}
+	}
+
+	public function getPagesDir() {
+		return $this->pagesDir;
+	}
+
+	public function &pageFactory($pageName = null) {
+		$pagesDir = $this->getPagesDir();
 		$p = $this->request->get(self::PAGE_VAR_NAME);
-		$pageName = strtolower(is_null($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName);
-		$pageFileName = "{$pagesDir}{$pageName}.php";
+		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
+		$pageName = basename($p);
+		$pagePath = dirname($p);
+		$pageFileName = "{$pagesDir}{$p}.php";
 		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
 			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
 		}
@@ -84,19 +103,24 @@ abstract class SA_Application extends SA_Object {
 		return $this->page;
 	}
 
+	public function error(Exception $e) {
+		throw $e;
+	}
+
 	public function run($sendHeaders = true) {
 		try {
-			$this->pageFactory();
-			$this->page->init();
+			$page = $this->pageFactory($this->request->get(self::PAGE_VAR_NAME));
+			$page->init();
 			if ($this->request->isGet()) {
-				$this->page->get();
+				$page->get();
 			} elseif ($this->request->isPost()) {
-				$this->page->post();
+				$page->post();
 			}
-			$this->response->body($this->page->content());
+			$this->response->body($page->content());
 			$this->response->send($sendHeaders);
+			$page->cleanup();
 		} catch(Exception $e) {
-			throw $e;
+			$this->error($e);
 		}
 	}
 }
