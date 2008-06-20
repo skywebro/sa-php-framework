@@ -22,16 +22,20 @@ class SA_Request extends SA_Object {
 	const REQUEST_METHOD_GET = 'GET';
 	const REQUEST_METHOD_POST = 'POST';
 	const REQUEST_AJAX = 'XMLHTTPREQUEST';
+
 	protected $get = null;
 	protected $post = null;
+	protected $request = null;
 	protected $cookies = null;
 	protected $server = null;
 	protected $env = null;
 
 	public function __construct() {
 		parent::__construct();
+		$this->detectParameters();
 		$this->get = new ArrayObject($_GET);
 		$this->post = new ArrayObject($_POST);
+		$this->request = new ArrayObject($_REQUEST);
 		$this->cookies = new ArrayObject($_COOKIE);
 		$this->server = new ArrayObject($_SERVER);
 		$this->env = new ArrayObject($_ENV);
@@ -43,6 +47,10 @@ class SA_Request extends SA_Object {
 
 	public function &post($key = null) {
 		return is_null($key) ? $this->post : $this->post[$key];
+	}
+
+	public function &request($key = null) {
+		return is_null($key) ? $this->request : $this->request[$key];
 	}
 
 	public function &cookie($key = null) {
@@ -63,6 +71,28 @@ class SA_Request extends SA_Object {
 
 	public function isPost() {
 		return strcasecmp($this->server('REQUEST_METHOD'), self::REQUEST_METHOD_POST) == 0;
+	}
+
+	public function detectParameters() {
+		$pathInfoStack = $pathInfo = explode('/', substr($_SERVER['PATH_INFO'], 1));
+		$pagesDir = SA_Application::singleton()->getPagesDir();
+		$pageName = $partialPathInfo = null;
+		for($i = 0; $i < count($pathInfo); $i++) {
+			$partialPathInfo = implode('/', $pathInfoStack);
+			if (is_file($file = $pagesDir . $partialPathInfo . '.php')) {
+				$pageName = $partialPathInfo;
+				break;
+			}
+			array_pop($pathInfoStack);
+		}
+		$matches = array();
+		$pattern = str_replace('/', '\/', is_null($pageName) ? "^$pageName(.*)$" : "^$pageName/(.*)$");
+		preg_match("/$pattern/", substr($_SERVER['PATH_INFO'], 1), $matches);
+		$params = explode('/', $matches[1]);
+		for($i = 0; $i < count($params); $i += 2) {
+			if (!empty($params[$i])) $_REQUEST[$params[$i]] = $_GET[$params[$i]] = $params[$i + 1];
+		}
+		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
 	}
 
 	public function isAjax() {

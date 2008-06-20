@@ -18,11 +18,12 @@
  * $Id$
  */
 
-require_once 'bootstrap.php';
+class Page_Index extends SA_SmartyPage {
+	public function init() {
+		$this->setTemplate(null);
+	}
 
-try {
-	$demo = new Demo_Application(BASE_DIR . 'app/');
-	$demo->run();
-} catch (Exception $e) {
-	print 'ERROR: ' . $e->getMessage();
+	public function get() {
+		print 'nested page without template';
+	}
 }

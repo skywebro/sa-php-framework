@@ -49,6 +49,8 @@ abstract class SA_Page extends SA_Object implements SA_IPage {
 
 	public function post() {}
 
+	public function cleanup() {}
+
 	public function &content($content = null) {
 		if (!is_null($content)) $this->content = $content;
 		return $this->content;
