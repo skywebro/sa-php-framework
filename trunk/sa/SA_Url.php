@@ -46,8 +46,9 @@ class SA_Url extends SA_Object {
 			for($i = 0; $i < count($paramKeys); $i++) {
 				if ($key = $paramKeys[$i]) {
 					$value = $params[$key];
-					if (is_null($value)) $value = '(null)';
+					if (is_null($value)) $value = '(:null:)';
 					elseif (is_array($value) || is_object($value)) $value = base64_encode(serialize($value));
+					$value = str_replace('/', '(:slash:)', $value);
 					$pairs[] = urlencode($key) . '/' . urlencode($value);
 				}
 			}
