@@ -38,7 +38,8 @@ class SA_Url extends SA_Object {
 
 		if ($actions) {
 			if (!is_array($actions)) $actions = array($actions);
-			$actions = implode('-', $actions);
+			$actions = array_map(create_function('$value', 'return is_string($value) ? trim($value) : $value;'), $actions);
+			$actions = implode(SA_Application::ACTIONS_SEPARATOR, $actions);
 			$url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . urlencode($actions);
 		}
 
