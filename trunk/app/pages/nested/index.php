@@ -31,5 +31,11 @@ class Page_index extends SA_SmartyPage {
 
 	public function get() {
 		print 'nested page without template';
+		print '<br>';
+		print '<div>';
+		print '<b>Request dump</b>:';
+		print SA::prettyDump(var_export($this->request->r(), true));
+		print '</div>';
+		print '<a href="' . SA_Url::url('/') . '">back</a>';
 	}
 }

@@ -20,13 +20,14 @@
 
 abstract class SA_Application extends SA_Object {
 	const PAGE_VAR_NAME = '__SA_PAGE__';
-	const ACTIONS_VAR_NAME = 'a';
+	const ACTIONS_VAR_NAME = 'do';
 	const DEFAULT_PAGE = 'index';
 	const SESSION_NAME = 'SASESSID';
 	const SECRET = 'alAb4laPor70cAla';
 
 	protected $request = null;
 	protected $response = null;
+	protected $currentPage = null;
 	protected $appDir = null;
 	protected $pagesDir = null;
 	protected $layoutsDir = null;
@@ -53,20 +54,35 @@ abstract class SA_Application extends SA_Object {
 		session_start();
 	}
 
-	public function getXMLPageMap() {
-		static $xml;
+	/**
+	 * Fetch the file system structure of the pages directory in a DOMDocument
+	 * The XML will be used by SA_Request in order to detect the page name
+	 * The contents will be read from cache only if DEBUG === false
+	 *
+	 * @see SA_Request::detectGetParameters
+	 * @return DOMDocument
+	 */
+
+	public function getDOMPageMap() {
+		static $doc;
 
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
 		if (DEBUG === true) $cache->expire();
-		elseif (isset($xml)) return $xml;
-		if ($xmlString = $cache->load()) {
-			$xml = new SimpleXMLElement($xmlString);
+		elseif (isset($doc)) return $doc;
+		$doc = new DOMDocument('1.0');
+		if ($domString = $cache->load()) {
+			$doc->loadXML($domString);
 		} else {
-			$xml = new SimpleXMLElement("<?xml version='1.0' standalone='yes'?><dirs/>");
-			$this->xmlFileSystem($this->getPagesDir(), $xml);
-			$cache->save($xml->asXML());
+			$doc->appendChild($pages = new DOMElement('pages'));
+			$this->domFileSystem($this->getPagesDir(), $pages);
+			$cache->save($doc->saveXML());
 		}
-		return $xml;
+		return $doc;
+	}
+
+	public function &getCurrentPage() {
+		if (!is_a($this->currentPage, 'SA_Page')) throw new Exception('Could not determine current page!');
+		return $this->currentPage;
 	}
 
 	public static function &singleton() {
@@ -157,13 +173,13 @@ abstract class SA_Application extends SA_Object {
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
 		}
-		$this->page = new $className($this->request, $this->response);
-		if (!in_array('SA_IPage', class_implements($this->page))) {
+		$this->currentPage = new $className($this->request, $this->response);
+		if (!in_array('SA_IPage', class_implements($this->currentPage))) {
 			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
 		}
-		$this->page->setPagePath($pagePath);
-		$this->page->setPageName($pageName);
-		return $this->page;
+		$this->currentPage->setPagePath($pagePath);
+		$this->currentPage->setPageName($pageName);
+		return $this->currentPage;
 	}
 
 	public function &layoutFactory($layoutName) {
@@ -194,12 +210,11 @@ abstract class SA_Application extends SA_Object {
 		try {
 			$page = $this->pageFactory();
 			$page->init();
-			$actions = explode('-', $this->request->r(self::ACTIONS_VAR_NAME));
-			foreach($actions as $action) {
-				$action = preg_replace('/[^a-z0-9_\/]/i', '_', $action);
-				$method = 'do' . ucfirst(strtolower($action));
-				if (method_exists($page, $method)) {
-					$page->$method();
+			if (is_array($actions = $this->request->r(self::ACTIONS_VAR_NAME))) {
+				foreach($actions as $action) {
+					$action = preg_replace('/[^a-z0-9_\/]/i', '_', $action);
+					$method = 'do' . ucfirst(strtolower($action));
+					if (method_exists($page, $method)) $page->$method();
 				}
 			}
 			if ($this->request->isGet()) {
@@ -215,20 +230,20 @@ abstract class SA_Application extends SA_Object {
 		}
 	}
 
-	protected function xmlFileSystem($dirName, SimpleXMLElement $xml) {
+	protected function domFileSystem($dir, DOMElement $node) {
 		try {
-			$dir = new DirectoryIterator($dirName);
-			foreach ($dir as $entry) {
+			$dirIterator = new DirectoryIterator($dir);
+			foreach ($dirIterator as $entry) {
 				$entryName = $entry->getFilename();
 				if ($entry->isDir()) {
 					if (!$entry->isDot()) {
-						$xmlDir = $xml->addChild('dir');
-						$xmlDir->addAttribute('name', $entryName);
-						$this->xmlFileSystem($dirName . '/' . $entryName, $xmlDir);
+						$node->appendChild($newNode = new DOMElement('dir'));
+						$newNode->setAttribute('name', $entryName);
+						$this->domFileSystem($dir . '/' . $entryName, $newNode);
 					}
 				} else {
-					$xmlFile = $xml->addChild('file');
-					$xmlFile->addAttribute('name', $entryName);
+					$node->appendChild($newNode = new DOMElement('file'));
+					$newNode->setAttribute('name', $entryName);
 				}
 			}
 		} catch (Exception $e) {}

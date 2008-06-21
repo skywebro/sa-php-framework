@@ -23,7 +23,11 @@ require_once 'SA_Object.php';
 class SA extends SA_Object {
 	public static function autoload($className) {
 		if (preg_match('/^SA_/', $className)) {
-			require_once BASE_DIR . "/sa/{$className}.php";
+			require_once SA_LIB_DIR . "{$className}.php";
 		}
+	}
+
+	public static function prettyDump($var) {
+		print '<div style="font-family:arial,helvetica,serif;font-size:12px;background-color:black;color:lime;padding:5px;border:3px solid red;">' . nl2br($var) . '</div>';
 	}
 }

@@ -21,6 +21,10 @@
 class SA_SimpleCache extends SA_Object {
 	protected static $instances = array();
 
+	public function __construct() {
+		throw new Exception('Use singleton method instead!');
+	}
+
 	public static function singleton($id) {
 		$md5Id = md5($id);
 		if (!isset(self::$instances[$md5Id])) {
