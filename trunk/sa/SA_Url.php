@@ -20,29 +20,18 @@
 
 class SA_Url extends SA_Object {
 	const MAX_LENGTH = 2083; //careful with this: maximum URL length is 2083 characters in Internet Explorer
-	protected static $instance = null;
-
-	public static function &singleton() {
-		if (is_null(self::$instance)) {
-			self::$instance = new stdClass();
-			$app = &SA_Application::singleton();
-			self::$instance->app = $app;
-			self::$instance->host = $app->request()->s('HTTP_HOST');
-			self::$instance->currentPage = $app->getCurrentPage();
-		}
-		return self::$instance;
-	}
+	protected static $parts = null;
 
 	public static function url($page = null, $actions = false, $params = array(), $port = 80, $secure = false) {
-		SA_Url::singleton();
+		SA_Url::init();
 		$protocol = $secure ? 'https' : 'http';
 		$page = trim(empty($page) ? SA_Application::DEFAULT_PAGE : $page, "\t ");
 		$isAbsolute = strpos($page, '/') === 0;
 		$isDir = substr($page, -1) == '/';
 		$page = trim($page, '/');
 		$page .= $isDir && $page ? '/' . SA_Application::DEFAULT_PAGE : '';
-		$page = $isAbsolute ? $page : self::$instance->currentPage->getPagePath() . $page;
-		$url = "$protocol://" . self::$instance->host . ($port == 80 ? '' : ":$port") . '/' . $page;
+		$page = $isAbsolute ? $page : self::$parts->currentPage->getPagePath() . $page;
+		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . '/' . $page;
 
 		if ($actions) {
 			if (!is_array($actions)) $actions = array($actions);
@@ -68,5 +57,15 @@ class SA_Url extends SA_Object {
 		if (strlen($url) > self::MAX_LENGTH) throw new Exception('The URL exceeds maximum length of ' . self::MAX_LENGTH . ' characters!');
 
 		return $url;
+	}
+
+	protected static function init() {
+		if (is_null(self::$parts)) {
+			self::$parts = new stdClass();
+			$app = &SA_Application::singleton();
+			self::$parts->app = $app;
+			self::$parts->host = $app->request()->s('HTTP_HOST');
+			self::$parts->currentPage = $app->getCurrentPage();
+		}
 	}
 }
