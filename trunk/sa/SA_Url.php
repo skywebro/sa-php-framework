@@ -43,7 +43,7 @@ class SA_Url extends SA_Object {
 		}
 
 		if (is_array($params)) {
-			$params = array_map(create_function('$value', 'return !is_array($value) && !is_object($value) && strcmp($value, "") == 0 ? null : $value;'), $params);
+			$params = array_map(create_function('$value', 'return is_scalar($value) && strcmp($value, "") == 0 ? null : $value;'), $params);
 			$paramKeys = array_keys($params);
 			$pairs = array();
 			for($i = 0; $i < count($paramKeys); $i++) {
