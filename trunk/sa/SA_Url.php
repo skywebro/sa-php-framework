@@ -38,9 +38,9 @@ class SA_Url extends SA_Object {
 
 		if ($actions = $params['actions']) {
 			if (!is_array($actions)) $actions = array($actions);
-			$actions = array_filter(array_map(create_function('$value', 'return str_replace("/", SA_Url::SLASH, (is_string($value) ? trim($value) : $value));'), $actions), create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0 ? true : false;'));
-			$actions = implode(SA_Application::ACTIONS_SEPARATOR, $actions);
-			$url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . urlencode($actions);
+			$actions = array_filter(array_map(create_function('$value', 'return is_scalar($value) ? str_replace("/", SA_Url::SLASH, trim($value)) : $value;'), $actions), create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0 ? true : false;'));
+			$actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions);
+			if (strlen($actionsString)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . urlencode($actionsString);
 			unset($params['actions']);
 		}
 
