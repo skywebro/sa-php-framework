@@ -34,13 +34,13 @@ class SA_Url extends SA_Object {
 		$page = trim($page, '/');
 		$page .= $isDir && $page ? '/' . SA_Application::DEFAULT_PAGE : '';
 		$page = $isAbsolute ? $page : self::$parts->currentPage->getPagePath() . $page;
-		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . '/' . $page;
+		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . '/' . str_replace('%2F', '/', rawurlencode($page));
 
 		if ($actions = $params['actions']) {
 			if (!is_array($actions)) $actions = array($actions);
 			$actions = array_filter(array_map(create_function('$value', 'return is_scalar($value) ? str_replace("/", SA_Url::SLASH, trim($value)) : $value;'), $actions), create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0 ? true : false;'));
 			$actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions);
-			if (strlen($actionsString)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . urlencode($actionsString);
+			if (strlen($actionsString)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . rawurlencode($actionsString);
 			unset($params['actions']);
 		}
 
@@ -52,7 +52,7 @@ class SA_Url extends SA_Object {
 					if (is_null($value)) $value = self::NULL;
 					elseif (is_array($value) || is_object($value)) $value = base64_encode(serialize($value));
 					else $value = str_replace('/', self::SLASH, $value);
-					$pairs[] = urlencode($key) . '/' . urlencode($value);
+					$pairs[] = rawurlencode($key) . '/' . rawurlencode($value);
 				}
 			}
 			if ($pairsString = implode('/', $pairs)) $url .= "/$pairsString";

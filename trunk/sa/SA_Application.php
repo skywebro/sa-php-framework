@@ -163,7 +163,7 @@ abstract class SA_Application extends SA_Object {
 		$p = $this->request->r(self::PAGE_VAR_NAME);
 		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
 		$pageName = basename($p);
-		$pagePath = dirname($p) . '/';
+		$pagePath = (($dir = dirname($p)) == '.') ? '' : $dir . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
 		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
