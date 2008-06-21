@@ -123,9 +123,9 @@ class SA_Request extends SA_Object {
 			$key = trim($params[$i]);
 			if (empty($key)) continue;
 			$value = trim($params[$i + 1]);
-			if (strcasecmp($value, '(:null:)') == 0) $value = null;
+			if (strcasecmp($value, SA_Url::NULL) == 0) $value = null;
 			elseif (is_array($possiblyEncoded = @unserialize(base64_decode($value))) || is_object($possiblyEncoded)) $value = $possiblyEncoded;
-			else $value = str_replace('(:slash:)', '/', $value);
+			else $value = str_replace(SA_Url::SLASH, '/', $value);
 			$_REQUEST[$key] = $_GET[$key] = $value;
 		}
 		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = explode('-', $_REQUEST[SA_Application::ACTIONS_VAR_NAME]);
