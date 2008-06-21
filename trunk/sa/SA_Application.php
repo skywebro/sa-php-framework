@@ -212,7 +212,7 @@ abstract class SA_Application extends SA_Object {
 			$page->init();
 			if (is_array($actions = $this->request->r(self::ACTIONS_VAR_NAME))) {
 				foreach($actions as $action) {
-					$action = preg_replace('/[^a-z0-9_\/]/i', '_', $action);
+					$action = preg_replace('/[^a-z0-9_]/i', '_', $action);
 					$method = 'do' . ucfirst(strtolower($action));
 					if (method_exists($page, $method)) $page->$method();
 				}
