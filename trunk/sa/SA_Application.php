@@ -21,6 +21,7 @@
 abstract class SA_Application extends SA_Object {
 	const PAGE_VAR_NAME = '__SA_PAGE__';
 	const ACTIONS_VAR_NAME = 'do';
+	const ACTIONS_SEPARATOR = '-';
 	const DEFAULT_PAGE = 'index';
 	const SESSION_NAME = 'SASESSID';
 	const SECRET = 'alAb4laPor70cAla';

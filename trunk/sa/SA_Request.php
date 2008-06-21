@@ -128,7 +128,7 @@ class SA_Request extends SA_Object {
 			else $value = str_replace(SA_Url::SLASH, '/', $value);
 			$_REQUEST[$key] = $_GET[$key] = $value;
 		}
-		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = explode('-', $_REQUEST[SA_Application::ACTIONS_VAR_NAME]);
+		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = explode(SA_Application::ACTIONS_SEPARATOR, $_REQUEST[SA_Application::ACTIONS_VAR_NAME]);
 		if ($pageName) $_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
 		//print_r($_GET);
 	}
