@@ -20,6 +20,7 @@
 
 abstract class SA_Application extends SA_Object {
 	const PAGE_VAR_NAME = '__SA_PAGE__';
+	const ACTIONS_VAR_NAME = 'a';
 	const DEFAULT_PAGE = 'index';
 	const SESSION_NAME = 'SASESSID';
 	const SECRET = 'alAb4laPor70cAla';
@@ -40,11 +41,15 @@ abstract class SA_Application extends SA_Object {
 		$this->setApplicationDir($appDir);
 		self::$instance = &$this;
 
-		$this->request = new SA_Request();
-		$this->response = new SA_Response();
+		try {
+			$this->request = new SA_Request();
+			$this->response = new SA_Response();
+		} catch (Exception $e) {
+			$this->error($e);
+		}
 
 		session_name(self::SESSION_NAME);
-		if ($sid = $this->request->request(self::SESSION_NAME)) session_id($sid);
+		if ($sid = $this->request->r(self::SESSION_NAME)) session_id($sid);
 		session_start();
 	}
 
@@ -54,8 +59,7 @@ abstract class SA_Application extends SA_Object {
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
 		if (DEBUG === true) $cache->expire();
 		elseif (isset($xml)) return $xml;
-		$xmlString = $cache->load();
-		if ($xmlString) {
+		if ($xmlString = $cache->load()) {
 			$xml = new SimpleXMLElement($xmlString);
 		} else {
 			$xml = new SimpleXMLElement("<?xml version='1.0' standalone='yes'?><dirs/>");
@@ -139,13 +143,16 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function &pageFactory($pageName = null) {
-		$p = $this->request->get(self::PAGE_VAR_NAME);
+		$p = $this->request->r(self::PAGE_VAR_NAME);
 		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
 		$pageName = basename($p);
 		$pagePath = dirname($p) . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
-		@include_once $pageFileName;
+		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
+			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
+		}
+		include_once $pageFileName;
 		$className = "Page_$pageName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
@@ -163,7 +170,10 @@ abstract class SA_Application extends SA_Object {
 		$layout = null;
 		$layoutPath = $this->getLayoutsDir();
 		$layoutFileName = "{$layoutPath}{$layoutName}.php";
-		@include_once $layoutFileName;
+		if (!is_file($layoutFileName) || !is_readable($layoutFileName)) {
+			throw new SA_FileNotFound_Exception("File $layoutFileName not found!");
+		}
+		include_once $layoutFileName;
 		$className = "Layout_$layoutName";
 		if (!class_exists($className)) {
 			throw new SA_PageInterface_Exception("Class $className does not exist!");
@@ -184,6 +194,14 @@ abstract class SA_Application extends SA_Object {
 		try {
 			$page = $this->pageFactory();
 			$page->init();
+			$actions = explode('-', $this->request->r(self::ACTIONS_VAR_NAME));
+			foreach($actions as $action) {
+				$action = preg_replace('/[^a-z0-9_\/]/i', '_', $action);
+				$method = 'do' . ucfirst(strtolower($action));
+				if (method_exists($page, $method)) {
+					$page->$method();
+				}
+			}
 			if ($this->request->isGet()) {
 				$page->get();
 			} elseif ($this->request->isPost()) {

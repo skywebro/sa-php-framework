@@ -21,6 +21,14 @@
 class Page_index extends SA_SmartyPage {
 	protected $hasTemplate = false;
 
+	public function doSomething() {
+		print 'something... ';
+	}
+
+	public function doElse() {
+		print 'else... ';
+	}
+
 	public function get() {
 		print 'nested page without template';
 	}
