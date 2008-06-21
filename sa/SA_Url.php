@@ -20,6 +20,9 @@
 
 class SA_Url extends SA_Object {
 	const MAX_LENGTH = 2083; //careful with this: maximum URL length is 2083 characters in Internet Explorer
+	const SLASH = '(:s:)';
+	const NULL = '(:n:)';
+
 	protected static $parts = null;
 
 	public static function url($page = null, $actions = false, $params = array(), $port = 80, $secure = false) {
@@ -46,9 +49,9 @@ class SA_Url extends SA_Object {
 			for($i = 0; $i < count($paramKeys); $i++) {
 				if ($key = $paramKeys[$i]) {
 					$value = $params[$key];
-					if (is_null($value)) $value = '(:null:)';
+					if (is_null($value)) $value = self::NULL;
 					elseif (is_array($value) || is_object($value)) $value = base64_encode(serialize($value));
-					$value = str_replace('/', '(:slash:)', $value);
+					else $value = str_replace('/', self::SLASH, $value);
 					$pairs[] = urlencode($key) . '/' . urlencode($value);
 				}
 			}
