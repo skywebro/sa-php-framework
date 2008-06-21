@@ -31,6 +31,7 @@ abstract class SA_SmartyPage extends SA_Page {
 		$this->smarty = new Smarty;
 		$this->smarty->use_sub_dirs = true;
 		$app = SA_Application::singleton();
+		$this->smarty->plugins_dir = array_merge($this->smarty->plugins_dir, array(SA_LIB_DIR . 'smarty_plugins'));
 		$this->smarty->template_dir = $app->getTemplatesDir();
 		$this->smarty->compile_dir = $app->getCompileDir();
 		$this->smarty->compile_id = md5($this->smarty->template_dir);

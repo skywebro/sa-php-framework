@@ -18,12 +18,11 @@
  * $Id$
  */
 
-ob_start();
-require_once 'bootstrap.php';
+function smarty_function_sa_url($params, &$smarty) {
+	$page = $params['page']; unset($params['page']);
+	$actions = $params['actions']; unset($params['actions']);
+	$port = isset($params['port']) ? $params['port'] : 80; unset($params['port']);
+	$secure = isset($params['secure']) ? $params['secure'] : false; unset($params['secure']);
 
-try {
-	$demo = new Demo_Application(BASE_DIR . 'app/');
-	$demo->run();
-} catch (Exception $e) {
-	SA::prettyDump($e);
+	return SA_Url::url($page, $actions, $params, $port, $secure);
 }

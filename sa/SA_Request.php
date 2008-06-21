@@ -90,8 +90,8 @@ class SA_Request extends SA_Object {
 
 		function pageXPath($pathInfo, $type) {
 			if (!is_array($pathInfo)) return null;
-			$pathInfo = array_filter($pathInfo, create_function('$value', 'return trim(urldecode($value)) !== "";'));
-			$xpath = array('//dirs');
+			$pathInfo = array_filter($pathInfo, create_function('$value', 'return trim($value) !== "";'));
+			$xpath = array('//pages');
 			if ($type == 'file') $fileName = array_pop($pathInfo);
 			foreach($pathInfo as $value) {
 				$xpath[] = "dir[@name='$value']";
@@ -105,26 +105,30 @@ class SA_Request extends SA_Object {
 			return $xPathString;
 		}
 
-		$xml = SA_Application::singleton()->getXMLPageMap();
+		$xPath = new DOMXPath(SA_Application::singleton()->getDOMPageMap());
 		for($i = 0; $i < count($pathInfoArray); $i++) {
 			if (strlen($partialPathInfo = implode('/', $pathInfoStack))) {
-				if ((substr($xpath = $partialPathInfo, -1) == '/') && is_array($entries = $xml->xpath(pageXPath($pathInfoStack, 'dir'))) && count($entries)) {
+				if ((substr($partialPathInfo, -1) == '/') && $xPath->query(pageXPath($pathInfoStack, 'dir'))->length) {
 					$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
-				} elseif (is_array($entries = $xml->xpath(pageXPath($pathInfoStack, 'file'))) && count($entries)) {
+				} elseif ($xPath->query(pageXPath($pathInfoStack, 'file'))->length) {
 					$pageName = trim($partialPathInfo, '/');
 				}
 				if ($pageName) break;
 			}
 			array_pop($pathInfoStack);
 		}
-		$params = array_filter(explode('/', trim(substr($pathInfo, strlen($pageName)), '/')), create_function('$value', 'return trim(urldecode($value)) !== "";'));
+		$params = array_filter(explode('/', trim(substr($pathInfo, strlen($pageName)), '/')), create_function('$value', 'return trim($value) !== "";'));
 		if (count($params) % 2) throw new SA_NoPage_Exception('Page not found');
 		for($i = 0; $i < count($params); $i += 2) {
 			$key = trim($params[$i]);
+			if (empty($key)) continue;
 			$value = trim($params[$i + 1]);
-			if (is_array($decoded = unserialize(base64_decode($value)))) $value = $decoded;
-			if (!empty($key)) $_REQUEST[$key] = $_GET[$key] = $value;
+			$possiblyEncoded = @unserialize(base64_decode($value));
+			if (strcasecmp($value, '(null)') == 0) $value = null;
+			elseif (is_array($possiblyEncoded) || is_object($possiblyEncoded)) $value = $possiblyEncoded;
+			$_REQUEST[$key] = $_GET[$key] = $value;
 		}
+		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = explode('-', $_REQUEST[SA_Application::ACTIONS_VAR_NAME]);
 		if ($pageName) $_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
 		//print_r($_GET);
 	}

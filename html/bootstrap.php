@@ -20,14 +20,12 @@
 
 define('DEBUG', true);
 define('BASE_DIR', dirname(__FILE__) . '/../');
+define('SA_LIB_DIR', BASE_DIR . 'sa/');
 define('SMARTY_DIR', BASE_DIR . 'smarty/');
 
-require_once BASE_DIR . 'sa/SA.php';
+require_once SA_LIB_DIR . 'SA.php';
 spl_autoload_register('SA::autoload');
 
 require_once BASE_DIR . 'Demo_Application.php';
 
-function pretty_error($e) {
-	print '<div style="font-family:arial,helvetica,serif;font-size:12px;background-color:black;color:lime;padding:5px;border:3px solid red;">' . nl2br($e) . '</div>';
-}
 
