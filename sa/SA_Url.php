@@ -44,11 +44,9 @@ class SA_Url extends SA_Object {
 
 		if (is_array($params)) {
 			$params = array_map(create_function('$value', 'return is_scalar($value) && strcmp($value, "") == 0 ? null : $value;'), $params);
-			$paramKeys = array_keys($params);
 			$pairs = array();
-			for($i = 0; $i < count($paramKeys); $i++) {
-				if ($key = $paramKeys[$i]) {
-					$value = $params[$key];
+			foreach($params as $key => $value) {
+				if (is_string($key) && strlen($key)) {
 					if (is_null($value)) $value = self::NULL;
 					elseif (is_array($value) || is_object($value)) $value = base64_encode(serialize($value));
 					else $value = str_replace('/', self::SLASH, $value);
