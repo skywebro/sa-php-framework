@@ -25,7 +25,7 @@ class SA_Url extends SA_Object {
 
 	protected static $parts = null;
 
-	public static function url($page = null, $actions = false, $params = array(), $port = 80, $secure = false) {
+	public static function url($page = null, $params = array(), $port = 80, $secure = false) {
 		SA_Url::init();
 		$protocol = $secure ? 'https' : 'http';
 		$page = trim(empty($page) ? SA_Application::DEFAULT_PAGE : $page, "\t ");
@@ -36,11 +36,12 @@ class SA_Url extends SA_Object {
 		$page = $isAbsolute ? $page : self::$parts->currentPage->getPagePath() . $page;
 		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . '/' . $page;
 
-		if ($actions) {
+		if ($actions = $params['actions']) {
 			if (!is_array($actions)) $actions = array($actions);
-			$actions = array_map(create_function('$value', 'return is_string($value) ? trim($value) : $value;'), $actions);
+			$actions = array_filter(array_map(create_function('$value', 'return str_replace("/", SA_Url::SLASH, (is_string($value) ? trim($value) : $value));'), $actions), create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0 ? true : false;'));
 			$actions = implode(SA_Application::ACTIONS_SEPARATOR, $actions);
 			$url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . urlencode($actions);
+			unset($params['actions']);
 		}
 
 		if (is_array($params)) {

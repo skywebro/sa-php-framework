@@ -84,7 +84,7 @@ class SA_Request extends SA_Object {
 	}
 
 	public function detectGetParameters() {
-		$pathInfo = substr($pathInfoString = $this->s('PATH_INFO'), strpos($pathInfoString, '/') + 1);
+		$pathInfo = urldecode(substr($pathInfoString = $this->s('PATH_INFO'), strpos($pathInfoString, '/') + 1));
 		$pathInfoStack = $pathInfoArray = explode('/', preg_replace('/[^a-z0-9_\/]/i', '_', $pathInfo));
 		$pageName = $partialPathInfo = null;
 

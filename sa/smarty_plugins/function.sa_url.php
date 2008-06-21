@@ -20,12 +20,12 @@
 
 function smarty_function_sa_url($params, &$smarty) {
 	$page = $params['page']; unset($params['page']);
-	$actions = empty($params['actions']) ? array() : explode(',', $params['actions']); unset($params['actions']);
+	$params['actions'] = empty($params['actions']) ? array() : explode(',', $params['actions']);
 	$port = isset($params['port']) ? $params['port'] : 80; unset($params['port']);
 	$secure = isset($params['secure']) ? $params['secure'] : false; unset($params['secure']);
 
 	try {
-		$url = SA_Url::url($page, $actions, $params, $port, $secure);
+		$url = SA_Url::url($page, $params, $port, $secure);
 	} catch(Exception $e) {
 		SA_Application::singleton()->error($e);
 	}
