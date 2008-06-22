@@ -56,6 +56,6 @@ class SA_Response extends SA_Object {
 
 	public function send($sendHeaders = true) {
 		if ($sendHeaders) $this->sendHeaders();
-		print $this->body;
+		print $this->body();
 	}
 }
