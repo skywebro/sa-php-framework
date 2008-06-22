@@ -41,7 +41,7 @@ abstract class SA_Application extends SA_Object {
 	public function __construct($appDir) {
 		parent::__construct();
 
-		$this->noCache = isset($_GET['nocache']);
+		$this->useCache(!isset($_GET['nocache']));
 		$this->setApplicationDir($appDir);
 		self::$instance = &$this;
 
@@ -57,6 +57,11 @@ abstract class SA_Application extends SA_Object {
 		session_start();
 	}
 
+	public function useCache($cache = null) {
+		$this->noCache = is_null($cache) ? $this->noCache : !$cache;
+		return !$this->noCache;
+	}
+
 	/**
 	 * Fetch the file system structure of the pages directory in a DOMDocument
 	 * The XML will be used by SA_Request in order to detect the page name
@@ -70,7 +75,7 @@ abstract class SA_Application extends SA_Object {
 		static $doc;
 
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
-		if ((DEBUG === true) || ($this->noCache)) $cache->expire();
+		if (DEBUG === true) $cache->expire();
 		elseif (isset($doc)) return $doc;
 		$doc = new DOMDocument('1.0');
 		if ($domString = $cache->load()) {
