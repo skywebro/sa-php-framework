@@ -83,7 +83,7 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function fetch($template = null) {
 		$template = is_null($template) ? $this->template : $template;
-		if (!$this->smarty->template_exists($template)) throw new SA_FileNotFound_Exception($this->getPageName() . ' template does not exist.');
+		if (!$this->smarty->template_exists($template)) throw new SA_FileNotFound_Exception($this->smarty->template_dir . $template . ' does not exist.');
 		return $this->smarty->fetch($template);
 	}
 
