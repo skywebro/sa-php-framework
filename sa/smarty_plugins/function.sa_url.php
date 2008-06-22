@@ -20,7 +20,7 @@
 
 function smarty_function_sa_url($params, &$smarty) {
 	$page = $params['page']; unset($params['page']);
-	$params['actions'] = empty($params['actions']) ? array() : explode(',', $params['actions']);
+	$params['actions'] = empty($params['actions']) ? null : explode(',', $params['actions']);
 	$port = isset($params['port']) ? $params['port'] : 80; unset($params['port']);
 	$secure = isset($params['secure']) ? $params['secure'] : false; unset($params['secure']);
 
