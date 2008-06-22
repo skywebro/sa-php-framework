@@ -30,7 +30,7 @@ abstract class SA_SmartyPage extends SA_Page {
 		parent::__construct($request, $response);
 		$this->smarty = new Smarty;
 		$this->smarty->use_sub_dirs = true;
-		$app = SA_Application::singleton();
+		$app = SA_Application::getInstance();
 		$this->smarty->plugins_dir = array_merge($this->smarty->plugins_dir, array(SA_LIB_DIR . 'smarty_plugins'));
 		$this->smarty->template_dir = $app->getTemplatesDir();
 		$this->smarty->compile_dir = $app->getCompileDir();
@@ -57,7 +57,7 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function setPagePath($path) {
 		parent::setPagePath($path);
-		$this->smarty->template_dir = SA_Application::singleton()->getTemplatesDir() . $path;
+		$this->smarty->template_dir = SA_Application::getInstance()->getTemplatesDir() . $path;
 		$this->smarty->compile_id = md5($this->smarty->template_dir);
 	}
 
@@ -70,7 +70,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function setLayout($layoutName = null) {
-		return $this->layout = is_null($layoutName) ? null : SA_Application::singleton()->layoutFactory($layoutName);
+		return $this->layout = is_null($layoutName) ? null : SA_Application::getInstance()->layoutFactory($layoutName);
 	}
 
 	public function hasLayout() {

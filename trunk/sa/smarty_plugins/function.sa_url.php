@@ -27,7 +27,7 @@ function smarty_function_sa_url($params, &$smarty) {
 	try {
 		$url = SA_Url::url($page, $params, $port, $secure);
 	} catch(Exception $e) {
-		SA_Application::singleton()->error($e);
+		SA_Application::getInstance()->error($e);
 	}
 
 	return $url;

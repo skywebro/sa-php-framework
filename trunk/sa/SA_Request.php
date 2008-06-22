@@ -105,7 +105,7 @@ class SA_Request extends SA_Object {
 			return implode('/', $xpath);
 		}
 
-		$xPath = new DOMXPath(SA_Application::singleton()->getDOMPageMap());
+		$xPath = new DOMXPath(SA_Application::getInstance()->getDOMPageMap());
 		for($i = 0; $i < count($pathInfoArray); $i++) {
 			if (strlen($partialPathInfo = implode('/', $pathInfoStack))) {
 				if ((substr($partialPathInfo, -1) == '/') && $xPath->query(pageXPath($pathInfoStack, 'dir'))->length) {

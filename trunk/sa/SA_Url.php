@@ -42,7 +42,7 @@ class SA_Url extends SA_Object {
 			if ($actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . rawurlencode($actionsString);
 		}
 		unset($params['actions']);
-		if (!SA_Application::singleton()->useCache()) $params[SA_Application::NOCACHE_VAR_NAME] = 1;
+		if (!SA_Application::getInstance()->useCache()) $params[SA_Application::NOCACHE_VAR_NAME] = 1;
 		if (is_array($params)) {
 			$params = array_map(create_function('$value', 'return is_scalar($value) && strcmp($value, "") == 0 ? null : $value;'), $params);
 			$pairs = array();
@@ -56,7 +56,7 @@ class SA_Url extends SA_Object {
 			}
 			if (strlen($pairsString = implode('/', $pairs))) $url .= "/$pairsString";
 		}
-		if (strlen($url) > self::MAX_LENGTH) throw new Exception('The URL exceeds maximum length of ' . self::MAX_LENGTH . ' characters!');
+		if (strlen($url) > self::MAX_LENGTH) throw new SA_Url_Exception('The URL exceeds maximum length of ' . self::MAX_LENGTH . ' characters!');
 
 		return $url;
 	}
@@ -73,7 +73,7 @@ class SA_Url extends SA_Object {
 	protected static function init() {
 		if (is_null(self::$parts)) {
 			self::$parts = new stdClass();
-			$app = &SA_Application::singleton();
+			$app = &SA_Application::getInstance();
 			self::$parts->app = $app;
 			self::$parts->host = $app->request()->s('HTTP_HOST');
 			self::$parts->currentPage = $app->getCurrentPage();
