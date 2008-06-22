@@ -29,7 +29,7 @@ class SA_Url extends SA_Object {
 		SA_Url::init();
 		$protocol = $secure ? 'https' : 'http';
 		$page = trim($page);
-		$page = empty($page) ? SA_Application::DEFAULT_PAGE : ($page == '/') ? '/' . SA_Application::DEFAULT_PAGE : $page;
+		$page = empty($page) ? SA_Application::DEFAULT_PAGE : preg_match('/^\/{1,}$/', $page) ? '/' . SA_Application::DEFAULT_PAGE : $page;
 		$isAbsolute = strpos($page, '/') === 0;
 		$isDir = substr($page, -1) == '/';
 		$page = trim($page, '/');
