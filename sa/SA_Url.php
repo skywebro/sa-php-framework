@@ -28,7 +28,8 @@ class SA_Url extends SA_Object {
 	public static function url($page = null, $params = array(), $port = 80, $secure = false) {
 		SA_Url::init();
 		$protocol = $secure ? 'https' : 'http';
-		$page = trim(empty($page) ? SA_Application::DEFAULT_PAGE : $page, "\t ");
+		$page = trim($page);
+		$page = empty($page) ? SA_Application::DEFAULT_PAGE : $page;
 		$isAbsolute = strpos($page, '/') === 0;
 		$isDir = substr($page, -1) == '/';
 		$page = trim($page, '/');
