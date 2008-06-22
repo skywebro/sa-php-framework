@@ -35,11 +35,13 @@ abstract class SA_Application extends SA_Object {
 	protected $templatesDir = null;
 	protected $compileDir = null;
 	protected $cacheDir = null;
+	protected $noCache = false;
 	protected static $instance = null;
 
 	public function __construct($appDir) {
 		parent::__construct();
 
+		$this->noCache = isset($_GET['nocache']);
 		$this->setApplicationDir($appDir);
 		self::$instance = &$this;
 
@@ -68,7 +70,7 @@ abstract class SA_Application extends SA_Object {
 		static $doc;
 
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
-		if (DEBUG === true) $cache->expire();
+		if ((DEBUG === true) || ($this->noCache)) $cache->expire();
 		elseif (isset($doc)) return $doc;
 		$doc = new DOMDocument('1.0');
 		if ($domString = $cache->load()) {
