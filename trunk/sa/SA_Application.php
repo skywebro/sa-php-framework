@@ -44,7 +44,7 @@ abstract class SA_Application extends SA_Object {
 	public function __construct($appDir) {
 		parent::__construct();
 
-		$this->useCache(!isset($_REQUEST['nocache']) && !preg_match('/\/' . self::NOCACHE_VAR_NAME . '\/1/i', $_SERVER['PATH_INFO']));
+		$this->useCache((USE_CACHE === true) || !(isset($_REQUEST['nocache']) || preg_match('/(\/' . self::NOCACHE_VAR_NAME . '\/1){1}/i', $_SERVER['PATH_INFO'])));
 		$this->setApplicationDir($appDir);
 		self::$instance = &$this;
 
