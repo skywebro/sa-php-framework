@@ -44,7 +44,7 @@ abstract class SA_Application extends SA_Object {
 	public function __construct($appDir) {
 		parent::__construct();
 
-		$this->useCache(!isset($_REQUEST['nocache']) && !preg_match('/\/nocache\/1/', $_SERVER['PATH_INFO']));
+		$this->useCache(!isset($_REQUEST['nocache']) && !preg_match('/\/' . self::NOCACHE_VAR_NAME . '\/1/i', $_SERVER['PATH_INFO']));
 		$this->setApplicationDir($appDir);
 		self::$instance = &$this;
 
@@ -68,7 +68,7 @@ abstract class SA_Application extends SA_Object {
 	/**
 	 * Fetch the file system structure of the pages directory in a DOMDocument
 	 * The XML will be used by SA_Request in order to detect the page name
-	 * The contents will be read from cache only if $_GET[self::NOCACHE_VAR_NAME] is not set
+	 * The contents will be read from cache only if $_REQUEST[self::NOCACHE_VAR_NAME] is not set
 	 *
 	 * @see SA_Request::detectGetParameters()
 	 * @return DOMDocument
