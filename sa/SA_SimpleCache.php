@@ -53,7 +53,7 @@ class SA_DiskCache extends SA_Object {
 	}
 
 	public function load() {
-		return $this->data = @file_get_contents($this->fileName);
+		return $this->data = (SA_Application::singleton()->useCache()) ? @file_get_contents($this->fileName) : null;
 	}
 
 	public function save($data = null) {
