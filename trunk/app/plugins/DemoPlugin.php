@@ -18,11 +18,32 @@
  * $Id$
  */
 
-require_once 'bootstrap.php';
+class DemoPlugin extends SA_PagePlugin {
+	public function beforeCreation() {
+		$this->which(__METHOD__);
+	}
 
-try {
-	$demo = new Demo_Application(BASE_DIR . 'app/');
-	$demo->registerPagePlugin('DemoPlugin', 'nested/')->run();
-} catch (Exception $e) {
-	SA::prettyDump($e);
+	public function beforeProcess() {
+		$this->which(__METHOD__);
+	}
+
+	public function beforeDisplay() {
+		$this->which(__METHOD__);
+	}
+
+	public function afterCreation() {
+		$this->which(__METHOD__);
+	}
+
+	public function afterProcess() {
+		$this->which(__METHOD__);
+	}
+
+	public function afterDisplay() {
+		$this->which(__METHOD__);
+	}
+
+	protected function which($method) {
+		print "<div>$method</div>";
+	}
 }
