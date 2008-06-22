@@ -29,21 +29,20 @@ class SA_Url extends SA_Object {
 		SA_Url::init();
 		$protocol = $secure ? 'https' : 'http';
 		$page = trim($page);
-		$page = empty($page) ? SA_Application::DEFAULT_PAGE : $page;
+		$page = empty($page) ? SA_Application::DEFAULT_PAGE : ($page == '/') ? '/' . SA_Application::DEFAULT_PAGE : $page;
 		$isAbsolute = strpos($page, '/') === 0;
 		$isDir = substr($page, -1) == '/';
 		$page = trim($page, '/');
 		$page .= $isDir && $page ? '/' . SA_Application::DEFAULT_PAGE : '';
 		$page = $isAbsolute ? $page : self::$parts->currentPage->getPagePath() . $page;
 		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . self::$parts->baseDir . str_replace('%2F', '/', rawurlencode($page));
-
 		if ($actions = $params['actions']) {
 			if (!is_array($actions)) $actions = array($actions);
 			$actions = array_map(create_function('$value', 'return str_replace("/", SA_Url::SLASH, trim($value));'), array_filter($actions, create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0;')));
 			if ($actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . rawurlencode($actionsString);
 		}
 		unset($params['actions']);
-
+		if (!SA_Application::singleton()->useCache()) $params[SA_Application::NOCACHE_VAR_NAME] = 1;
 		if (is_array($params)) {
 			$params = array_map(create_function('$value', 'return is_scalar($value) && strcmp($value, "") == 0 ? null : $value;'), $params);
 			$pairs = array();
@@ -57,9 +56,6 @@ class SA_Url extends SA_Object {
 			}
 			if (strlen($pairsString = implode('/', $pairs))) $url .= "/$pairsString";
 		}
-
-		if (!SA_Application::singleton()->useCache()) $url .= '?' . SA_Application::NOCACHE_VAR_NAME;
-
 		if (strlen($url) > self::MAX_LENGTH) throw new Exception('The URL exceeds maximum length of ' . self::MAX_LENGTH . ' characters!');
 
 		return $url;
