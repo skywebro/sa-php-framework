@@ -53,12 +53,22 @@ class SA_DiskCache extends SA_Object {
 	}
 
 	public function load() {
-		return $this->data = (SA_Application::singleton()->useCache()) ? @file_get_contents($this->fileName) : null;
+		$data = null;
+		if (SA_Application::singleton()->useCache()) {
+			if (is_file($this->fileName) && is_readable($this->fileName)) {
+				$this->data = $data = file_get_contents($this->fileName);
+			}
+		}
+		return $data;
 	}
 
 	public function save($data = null) {
+		if (!SA_Application::singleton()->useCache()) return null;
 		$this->data = is_null($data) ? $this->data : $data;
-		return @file_put_contents($this->fileName, $this->data, LOCK_EX);
+		if (!is_writable($outputDir = dirname($this->fileName))) {
+			throw new SA_FileNotFound_Exception("Cache directory ($outputDir) doesn't exist or is not writable!");
+		}
+		return file_put_contents($this->fileName, $this->data, LOCK_EX);
 	}
 
 	public function expire() {
