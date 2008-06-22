@@ -101,8 +101,8 @@ class SA_Request extends SA_Object {
 			} elseif ($type == 'file') {
 				$xpath[] = "file[@name='{$fileName}.php']";
 			}
-			$xPathString = implode('/', $xpath);
-			return $xPathString;
+
+			return implode('/', $xpath);
 		}
 
 		$xPath = new DOMXPath(SA_Application::singleton()->getDOMPageMap());
@@ -111,13 +111,13 @@ class SA_Request extends SA_Object {
 				if ((substr($partialPathInfo, -1) == '/') && $xPath->query(pageXPath($pathInfoStack, 'dir'))->length) {
 					$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
 				} elseif ($xPath->query(pageXPath($pathInfoStack, 'file'))->length) {
-					$pageName = trim($partialPathInfo, '/');
+					$pageName = trim($partialPathInfo, "\t /");
 				}
 				if ($pageName) break;
 			}
 			array_pop($pathInfoStack);
 		}
-		$params = array_filter(explode('/', trim(substr($pathInfo, strlen($pageName)), '/')), create_function('$value', 'return trim($value) !== "";'));
+		$params = array_filter(explode('/', trim(substr($pathInfo, strlen($pageName)), "\t /")), create_function('$value', 'return trim($value) !== "";'));
 		if (count($params) % 2) throw new SA_NoPage_Exception('Page not found');
 		for($i = 0; $i < count($params); $i += 2) {
 			$key = trim($params[$i]);
@@ -128,7 +128,7 @@ class SA_Request extends SA_Object {
 			else $value = str_replace(SA_Url::SLASH, '/', $value);
 			$_REQUEST[$key] = $_GET[$key] = $value;
 		}
-		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = explode(SA_Application::ACTIONS_SEPARATOR, $_REQUEST[SA_Application::ACTIONS_VAR_NAME]);
+		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = isset($_REQUEST[SA_Application::ACTIONS_VAR_NAME]) ? explode(SA_Application::ACTIONS_SEPARATOR, $_REQUEST[SA_Application::ACTIONS_VAR_NAME]) : array();
 		if ($pageName) $_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
 		//print_r($_GET);
 	}
