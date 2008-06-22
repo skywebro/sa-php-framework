@@ -96,7 +96,7 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public static function &singleton() {
-		if (is_null(self::$instance)) {
+		if (!is_a(self::$instance, 'SA_Application')) {
 			throw new SA_NoApplication_Exception('Application not instantiated!');
 		}
 		return self::$instance;
@@ -192,7 +192,7 @@ abstract class SA_Application extends SA_Object {
 		}
 		include_once $pluginFileName;
 		if (!class_exists($pluginClass)) {
-			throw new SA_PageInterface_Exception("Class $pluginClass does not exist!");
+			throw new SA_NoClass_Exception("Class $pluginClass does not exist!");
 		}
 		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 		$plugin = new $pluginClass($this->request, $this->response, $reg);
@@ -216,7 +216,7 @@ abstract class SA_Application extends SA_Object {
 		include_once $pageFileName;
 		$className = "Page_$pageName";
 		if (!class_exists($className)) {
-			throw new SA_PageInterface_Exception("Class $className does not exist!");
+			throw new SA_NoClass_Exception("Class $className does not exist!");
 		}
 		$this->currentPage = new $className($this->request, $this->response);
 		if (!in_array('SA_IPage', class_implements($this->currentPage))) {
@@ -237,7 +237,7 @@ abstract class SA_Application extends SA_Object {
 		include_once $layoutFileName;
 		$className = "Layout_$layoutName";
 		if (!class_exists($className)) {
-			throw new SA_PageInterface_Exception("Class $className does not exist!");
+			throw new SA_NoClass_Exception("Class $className does not exist!");
 		}
 		$layout = new $className($this->request, $this->response);
 		$smarty = $layout->getSmarty();
