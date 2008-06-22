@@ -192,11 +192,11 @@ abstract class SA_Application extends SA_Object {
 		}
 		include_once $pluginFileName;
 		if (!class_exists($pluginClass)) {
-			throw new SA_PageInterface_Exception("Class $className does not exist!");
+			throw new SA_PageInterface_Exception("Class $pluginClass does not exist!");
 		}
 		$plugin = new $pluginClass($this->request, $this->response, $pageExp);
 		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
-			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
+			throw new SA_PageInterface_Exception("Class $pluginClass must implement SA_IPagePlugin interface!");
 		}
 		$this->pagePlugins[$page][] = $plugin;
 		return $this;
