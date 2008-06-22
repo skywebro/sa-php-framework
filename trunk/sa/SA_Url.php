@@ -35,7 +35,7 @@ class SA_Url extends SA_Object {
 		$page = trim($page, '/');
 		$page .= $isDir && $page ? '/' . SA_Application::DEFAULT_PAGE : '';
 		$page = $isAbsolute ? $page : self::$parts->currentPage->getPagePath() . $page;
-		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . '/' . str_replace('%2F', '/', rawurlencode($page));
+		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . self::$parts->baseDir . str_replace('%2F', '/', rawurlencode($page));
 
 		if ($actions = $params['actions']) {
 			if (!is_array($actions)) $actions = array($actions);
@@ -65,6 +65,15 @@ class SA_Url extends SA_Object {
 		return $url;
 	}
 
+	public static function baseHref() {
+		SA_Url::init();
+		$protocol = self::$parts->app->request()->s('HTTPS') ? 'https' : 'http';
+		$port = self::$parts->app->request()->s('SERVER_PORT');
+		$baseHref = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . self::$parts->baseDir;
+
+		return $baseHref;
+	}
+
 	protected static function init() {
 		if (is_null(self::$parts)) {
 			self::$parts = new stdClass();
@@ -72,6 +81,8 @@ class SA_Url extends SA_Object {
 			self::$parts->app = $app;
 			self::$parts->host = $app->request()->s('HTTP_HOST');
 			self::$parts->currentPage = $app->getCurrentPage();
+			self::$parts->baseDir = dirname(self::$parts->app->request()->s('SCRIPT_NAME'));
+			self::$parts->baseDir = self::$parts->baseDir == '/' ? '/' : self::$parts->baseDir . '/';
 		}
 	}
 }
