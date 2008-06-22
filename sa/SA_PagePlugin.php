@@ -18,11 +18,23 @@
  * $Id$
  */
 
-require_once 'bootstrap.php';
+abstract class SA_PagePlugin implements SA_IPagePlugin {
+	protected $request = null;
+	protected $response = null;
+	protected $pageExp = null;
 
-try {
-	$demo = new Demo_Application(BASE_DIR . 'app/');
-	$demo->registerPagePlugin('DemoPlugin', 'nested/')->run();
-} catch (Exception $e) {
-	SA::prettyDump($e);
+	public function __construct(SA_Request $request, SA_Response $response, $pageExp) {
+		$this->request = $request;
+		$this->response = $response;
+		$this->pageExp = '/' . str_replace('/', '\/', $pageExp) . '/';
+	}
+	public function pageMatch($page) {
+		return preg_match($this->pageExp, $page);
+	}
+	public function beforeCreate() {}
+	public function beforeProcess() {}
+	public function beforeDisplay() {}
+	public function afterCreate() {}
+	public function afterProcess() {}
+	public function afterDisplay() {}
 }

@@ -129,7 +129,7 @@ class SA_Request extends SA_Object {
 			$_REQUEST[$key] = $_GET[$key] = $value;
 		}
 		$_REQUEST[SA_Application::ACTIONS_VAR_NAME] = $_GET[SA_Application::ACTIONS_VAR_NAME] = isset($_REQUEST[SA_Application::ACTIONS_VAR_NAME]) ? explode(SA_Application::ACTIONS_SEPARATOR, $_REQUEST[SA_Application::ACTIONS_VAR_NAME]) : array();
-		if ($pageName) $_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = $pageName;
+		$_REQUEST[SA_Application::PAGE_VAR_NAME] = $_GET[SA_Application::PAGE_VAR_NAME] = empty($pageName) ? SA_Application::DEFAULT_PAGE : $pageName;
 		//print_r($_GET);
 	}
 }

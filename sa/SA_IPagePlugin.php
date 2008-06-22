@@ -18,11 +18,12 @@
  * $Id$
  */
 
-require_once 'bootstrap.php';
-
-try {
-	$demo = new Demo_Application(BASE_DIR . 'app/');
-	$demo->registerPagePlugin('DemoPlugin', 'nested/')->run();
-} catch (Exception $e) {
-	SA::prettyDump($e);
+interface SA_IPagePlugin {
+	public function pageMatch($page);
+	public function beforeCreation();
+	public function beforeProcess();
+	public function beforeDisplay();
+	public function afterCreation();
+	public function afterProcess();
+	public function afterDisplay();
 }

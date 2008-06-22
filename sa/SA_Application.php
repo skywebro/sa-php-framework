@@ -22,6 +22,7 @@ abstract class SA_Application extends SA_Object {
 	const PAGE_VAR_NAME = '__SA_PAGE__';
 	const ACTIONS_VAR_NAME = 'do';
 	const ACTIONS_SEPARATOR = '-';
+	const NOCACHE_VAR_NAME = 'nocache';
 	const DEFAULT_PAGE = 'index';
 	const SESSION_NAME = 'SASESSID';
 	const SECRET = 'alAb4laPor70cAla';
@@ -35,6 +36,8 @@ abstract class SA_Application extends SA_Object {
 	protected $templatesDir = null;
 	protected $compileDir = null;
 	protected $cacheDir = null;
+	protected $pagePluginsDir = null;
+	protected $pagePlugins = array();
 	protected $noCache = false;
 	protected static $instance = null;
 
@@ -65,9 +68,9 @@ abstract class SA_Application extends SA_Object {
 	/**
 	 * Fetch the file system structure of the pages directory in a DOMDocument
 	 * The XML will be used by SA_Request in order to detect the page name
-	 * The contents will be read from cache only if DEBUG === false
+	 * The contents will be read from cache only if $_GET[self::NOCACHE_VAR_NAME] is not set
 	 *
-	 * @see SA_Request::detectGetParameters
+	 * @see SA_Request::detectGetParameters()
 	 * @return DOMDocument
 	 */
 
@@ -114,6 +117,7 @@ abstract class SA_Application extends SA_Object {
 			$this->setPagesDir($appDir . 'pages/');
 			$this->setLayoutsDir($appDir . 'layouts/');
 			$this->setTemplatesDir($appDir . 'templates/');
+			$this->setPagePluginsDir($appDir . 'plugins/');
 			$this->setCompileDir($appDir . 'templates_c/');
 		} else {
 			throw new SA_DirNotFound_Exception('Application directory not found or not readable!');
@@ -163,6 +167,39 @@ abstract class SA_Application extends SA_Object {
 
 	public function getCacheDir() {
 		return $this->cacheDir;
+	}
+
+	public function setPagePluginsDir($pagePluginsDir) {
+		$this->pagePluginsDir = $pagePluginsDir;
+	}
+
+	public function getPagePluginsDir() {
+		return $this->pagePluginsDir;
+	}
+
+	/**
+	 * Registers a page level plugin
+	 *
+	 * @param string $pluginClass
+	 * @param string $pageExp can be any valid regular expression string
+	 * @return SA_Application
+	 */
+
+	public function &registerPagePlugin($pluginClass, $pageExp) {
+		$pluginFileName = $this->getPagePluginsDir() . "$pluginClass.php";
+		if (!is_file($pluginFileName) || !is_readable($pluginFileName)) {
+			throw new SA_FileNotFound_Exception("File $pluginFileName not found!");
+		}
+		include_once $pluginFileName;
+		if (!class_exists($pluginClass)) {
+			throw new SA_PageInterface_Exception("Class $className does not exist!");
+		}
+		$plugin = new $pluginClass($this->request, $this->response, $pageExp);
+		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
+			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
+		}
+		$this->pagePlugins[$page][] = $plugin;
+		return $this;
 	}
 
 	public function &pageFactory($pageName = null) {
@@ -215,8 +252,13 @@ abstract class SA_Application extends SA_Object {
 
 	public function run($sendHeaders = true) {
 		try {
+			ob_start();
+			$this->runPagePlugins($this->request->r(self::PAGE_VAR_NAME), 'beforeCreation');
 			$page = $this->pageFactory();
+			$pageName = $page->getPagePath() . $page->getPageName();
+			$this->runPagePlugins($pageName, 'afterCreation');
 			$page->init();
+			$this->runPagePlugins($pageName, 'beforeProcess');
 			if (is_array($actions = $this->request->r(self::ACTIONS_VAR_NAME))) {
 				foreach($actions as $action) {
 					$action = preg_replace('/[^a-z0-9_]/i', '_', $action);
@@ -229,11 +271,26 @@ abstract class SA_Application extends SA_Object {
 			} elseif ($this->request->isPost()) {
 				$page->post();
 			}
-			$this->response->body($page->content());
-			$this->response->send($sendHeaders);
+			$this->runPagePlugins($pageName, 'afterProcess');
 			$page->cleanup();
+			$output = ob_get_contents();
+			ob_end_clean();
+			$output .= $page->content();
+			$this->response->body($output);
+			$this->runPagePlugins($pageName, 'beforeDisplay');
+			$this->response->send($sendHeaders);
+			$this->runPagePlugins($pageName, 'afterDisplay');
 		} catch(Exception $e) {
 			$this->error($e);
+		}
+	}
+
+	protected function runPagePlugins($page, $event) {
+		reset($this->pagePlugins);
+		foreach($this->pagePlugins as $plugins) {
+			foreach($plugins as $plugin) {
+				if ($plugin->pageMatch($page)) $plugin->$event();
+			}
 		}
 	}
 
