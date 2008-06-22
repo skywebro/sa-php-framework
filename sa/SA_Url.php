@@ -40,8 +40,7 @@ class SA_Url extends SA_Object {
 		if ($actions = $params['actions']) {
 			if (!is_array($actions)) $actions = array($actions);
 			$actions = array_map(create_function('$value', 'return str_replace("/", SA_Url::SLASH, trim($value));'), array_filter($actions, create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0;')));
-			$actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions);
-			if (strlen($actionsString)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . rawurlencode($actionsString);
+			if ($actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . rawurlencode($actionsString);
 			unset($params['actions']);
 		}
 
@@ -56,7 +55,7 @@ class SA_Url extends SA_Object {
 					$pairs[] = rawurlencode($key) . '/' . rawurlencode($value);
 				}
 			}
-			if ($pairsString = implode('/', $pairs)) $url .= "/$pairsString";
+			if (strlen($pairsString = implode('/', $pairs))) $url .= "/$pairsString";
 		}
 
 		if (strlen($url) > self::MAX_LENGTH) throw new Exception('The URL exceeds maximum length of ' . self::MAX_LENGTH . ' characters!');
