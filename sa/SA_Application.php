@@ -90,11 +90,11 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function &getCurrentPage() {
-		if (!is_a($this->currentPage, 'SA_Page')) throw new Exception('Could not determine current page!');
+		if (!is_a($this->currentPage, 'SA_Page')) throw new SA_NoPage_Exception('Could not determine current page!');
 		return $this->currentPage;
 	}
 
-	public static function &singleton() {
+	public static function &getInstance() {
 		if (!is_a(self::$instance, 'SA_Application')) {
 			throw new SA_NoApplication_Exception('Application not instantiated!');
 		}

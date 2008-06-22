@@ -22,7 +22,7 @@ class SA_SimpleCache extends SA_Object {
 	protected static $instances = array();
 
 	public function __construct() {
-		throw new Exception('Use singleton method instead!');
+		throw new SA_Exception('Use singleton method instead!');
 	}
 
 	public static function singleton($id) {
@@ -41,7 +41,7 @@ class SA_DiskCache extends SA_Object {
 	public function __construct($id) {
 		parent::__construct();
 		$this->id = $id;
-		$this->fileName = SA_Application::singleton()->getCacheDir() . md5(SA_Application::SECRET . $id . SA_Application::SECRET);
+		$this->fileName = SA_Application::getInstance()->getCacheDir() . md5(SA_Application::SECRET . $id . SA_Application::SECRET);
 	}
 
 	public function getData() {
@@ -54,7 +54,7 @@ class SA_DiskCache extends SA_Object {
 
 	public function load() {
 		$data = null;
-		if (SA_Application::singleton()->useCache()) {
+		if (SA_Application::getInstance()->useCache()) {
 			if (is_file($this->fileName) && is_readable($this->fileName)) {
 				$this->data = $data = file_get_contents($this->fileName);
 			}
@@ -63,7 +63,7 @@ class SA_DiskCache extends SA_Object {
 	}
 
 	public function save($data = null) {
-		if (!SA_Application::singleton()->useCache()) return null;
+		if (!SA_Application::getInstance()->useCache()) return null;
 		$this->data = is_null($data) ? $this->data : $data;
 		if (!is_writable($outputDir = dirname($this->fileName))) {
 			throw new SA_FileNotFound_Exception("Cache directory ($outputDir) doesn't exist or is not writable!");

@@ -18,12 +18,4 @@
  * $Id$
  */
 
-function smarty_function_sa_base_href($params, &$smarty) {
-	try {
-		$baseHref = SA_Url::baseHref();
-	} catch(Exception $e) {
-		SA_Application::getInstance()->error($e);
-	}
-
-	return $baseHref;
-}
+class SA_Url_Exception extends SA_Exception {}
