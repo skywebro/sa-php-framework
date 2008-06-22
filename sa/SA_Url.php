@@ -58,6 +58,8 @@ class SA_Url extends SA_Object {
 			if (strlen($pairsString = implode('/', $pairs))) $url .= "/$pairsString";
 		}
 
+		if (!SA_Application::singleton()->useCache()) $url .= '?nocache';
+
 		if (strlen($url) > self::MAX_LENGTH) throw new Exception('The URL exceeds maximum length of ' . self::MAX_LENGTH . ' characters!');
 
 		return $url;

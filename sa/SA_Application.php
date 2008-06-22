@@ -74,9 +74,8 @@ abstract class SA_Application extends SA_Object {
 	public function getDOMPageMap() {
 		static $doc;
 
+		if (isset($doc)) return $doc;
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
-		if (DEBUG === true) $cache->expire();
-		elseif (isset($doc)) return $doc;
 		$doc = new DOMDocument('1.0');
 		if ($domString = $cache->load()) {
 			$doc->loadXML($domString);
