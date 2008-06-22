@@ -194,11 +194,12 @@ abstract class SA_Application extends SA_Object {
 		if (!class_exists($pluginClass)) {
 			throw new SA_PageInterface_Exception("Class $pluginClass does not exist!");
 		}
-		$plugin = new $pluginClass($this->request, $this->response, $pageExp);
+		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
+		$plugin = new $pluginClass($this->request, $this->response, $reg);
 		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
 			throw new SA_PageInterface_Exception("Class $pluginClass must implement SA_IPagePlugin interface!");
 		}
-		$this->pagePlugins[$page][] = $plugin;
+		$this->pagePlugins[$reg][md5("{$pluginClass}{$reg}")] = $plugin;
 		return $this;
 	}
 
@@ -287,9 +288,9 @@ abstract class SA_Application extends SA_Object {
 
 	protected function runPagePlugins($page, $event) {
 		reset($this->pagePlugins);
-		foreach($this->pagePlugins as $plugins) {
-			foreach($plugins as $plugin) {
-				if ($plugin->pageMatch($page)) $plugin->$event();
+		foreach($this->pagePlugins as $reg => $plugins) {
+			if (preg_match($reg, $page)) {
+				foreach($plugins as $plugin) $plugin->$event();
 			}
 		}
 	}

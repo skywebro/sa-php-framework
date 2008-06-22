@@ -26,7 +26,7 @@ abstract class SA_PagePlugin implements SA_IPagePlugin {
 	public function __construct(SA_Request $request, SA_Response $response, $pageExp) {
 		$this->request = $request;
 		$this->response = $response;
-		$this->pageExp = '/' . str_replace('/', '\/', $pageExp) . '/';
+		$this->pageExp = $pageExp;
 	}
 	public function pageMatch($page) {
 		return preg_match($this->pageExp, $page);
