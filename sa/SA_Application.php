@@ -68,6 +68,7 @@ abstract class SA_Application extends SA_Object {
 	 * Fetch the file system structure of the pages directory in a DOMDocument
 	 * The XML will be used by SA_Request in order to detect the page name
 	 * The contents will be read from cache only if $_REQUEST[self::NOCACHE_VAR_NAME] is not set
+	 * USE_CACHE overrides the request parameter
 	 *
 	 * @see SA_Request::detectGetParameters()
 	 * @return DOMDocument
@@ -95,9 +96,7 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public static function &getInstance() {
-		if (!is_a(self::$instance, 'SA_Application')) {
-			throw new SA_NoApplication_Exception('Application not instantiated!');
-		}
+		if (!is_a(self::$instance, 'SA_Application')) throw new SA_NoApplication_Exception('Application not instantiated!');
 		return self::$instance;
 	}
 
@@ -110,7 +109,7 @@ abstract class SA_Application extends SA_Object {
 	}
 
 	public function setApplicationDir($appDir) {
-		if (is_dir($appDir) && is_readable($appDir)) {
+		if (is_readable($appDir)) {
 			$this->appDir = $appDir;
 			$this->setCacheDir($appDir . 'cache/');
 			$this->setPagesDir($appDir . 'pages/');
@@ -186,13 +185,7 @@ abstract class SA_Application extends SA_Object {
 
 	public function &registerPagePlugin($pluginClass, $pageExp) {
 		$pluginFileName = $this->getPagePluginsDir() . "$pluginClass.php";
-		if (!is_file($pluginFileName) || !is_readable($pluginFileName)) {
-			throw new SA_FileNotFound_Exception("File $pluginFileName not found!");
-		}
 		include_once $pluginFileName;
-		if (!class_exists($pluginClass)) {
-			throw new SA_NoClass_Exception("Class $pluginClass does not exist!");
-		}
 		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 		$plugin = new $pluginClass($this->request, $this->response, $reg);
 		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
@@ -209,14 +202,8 @@ abstract class SA_Application extends SA_Object {
 		$pagePath = (($dir = dirname($p)) == '.') ? '' : $dir . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
-		if (!is_file($pageFileName) || !is_readable($pageFileName)) {
-			throw new SA_FileNotFound_Exception("File $pageFileName not found!");
-		}
 		include_once $pageFileName;
 		$className = "Page_$pageName";
-		if (!class_exists($className)) {
-			throw new SA_NoClass_Exception("Class $className does not exist!");
-		}
 		$this->currentPage = new $className($this->request, $this->response);
 		if (!in_array('SA_IPage', class_implements($this->currentPage))) {
 			throw new SA_PageInterface_Exception("Class $className must implement SA_IPage interface!");
@@ -230,14 +217,8 @@ abstract class SA_Application extends SA_Object {
 		$layout = null;
 		$layoutPath = $this->getLayoutsDir();
 		$layoutFileName = "{$layoutPath}{$layoutName}.php";
-		if (!is_file($layoutFileName) || !is_readable($layoutFileName)) {
-			throw new SA_FileNotFound_Exception("File $layoutFileName not found!");
-		}
 		include_once $layoutFileName;
 		$className = "Layout_$layoutName";
-		if (!class_exists($className)) {
-			throw new SA_NoClass_Exception("Class $className does not exist!");
-		}
 		$layout = new $className($this->request, $this->response);
 		$smarty = $layout->getSmarty();
 		$smarty->template_dir = $this->getTemplatesDir() . 'layouts/';
