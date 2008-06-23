@@ -19,7 +19,7 @@
  */
 
 class Page_index extends SA_SmartyPage {
-	protected $hasTemplate = false;
+	protected $useTemplate = false;
 
 	public function doSomething() {
 		print 'something... ';

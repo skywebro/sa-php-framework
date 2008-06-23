@@ -108,7 +108,7 @@ abstract class SA_Application extends SA_Object {
 		return $this->response;
 	}
 
-	public function setApplicationDir($appDir) {
+	public function &setApplicationDir($appDir) {
 		if (is_readable($appDir)) {
 			$this->appDir = $appDir;
 			$this->setCacheDir($appDir . 'cache/');
@@ -259,7 +259,7 @@ abstract class SA_Application extends SA_Object {
 			$page->cleanup();
 			$output = ob_get_contents();
 			ob_end_clean();
-			$output .= $page->content();
+			$output = $page->content($output);
 			$this->response->body($output);
 			$this->runPagePlugins($pageName, 'beforeDisplay');
 			$this->response->send($sendHeaders);
