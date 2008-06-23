@@ -22,9 +22,9 @@ require_once SMARTY_DIR . 'Smarty.class.php';
 
 abstract class SA_SmartyPage extends SA_Page {
 	protected $smarty = null;
-	protected $template = '';
+	protected $template = null;
 	protected $layout = null;
-	protected $hasTemplate = true;
+	protected $useTemplate = true;
 
 	public function __construct(SA_Request $request, SA_Response $response) {
 		parent::__construct($request, $response);
@@ -47,12 +47,12 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function hasTemplate() {
-		return ($this->hasTemplate == true) && (!is_null($this->template));
+		return ($this->useTemplate == true) && (!is_null($this->template));
 	}
 
 	public function setPageName($name) {
 		parent::setPageName($name);
-		$this->setTemplate($this->hasTemplate() ? "$name.tpl" : null);
+		$this->setTemplate($this->useTemplate == true ? "$name.tpl" : null);
 	}
 
 	public function setPagePath($path) {
@@ -62,7 +62,8 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function setTemplate($template = null) {
-		$this->template = is_null($template) ? null : $template;
+		$this->template = $template;
+		$this->useTemplate = !is_null($this->template);
 	}
 
 	public function getTemplate($template) {
@@ -74,7 +75,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function hasLayout() {
-		return !is_null($this->layout) && is_a($this->layout, 'SA_Layout');
+		return !is_null($this->layout) && is_a($this->layout, 'SA_IPage');
 	}
 
 	public function &getLayout() {
@@ -88,7 +89,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function &content($content = null) {
-		$content = $this->hasTemplate() ? $this->fetch() : null;
+		$content .= $this->hasTemplate() ? $this->fetch() : null;
 		if ($this->hasLayout()) {
 			$this->layout->assign('__CONTENT_FOR_LAYOUT__', $content);
 			$content = $this->layout->fetch();
