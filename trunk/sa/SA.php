@@ -23,18 +23,8 @@ require_once 'SA_Object.php';
 class SA extends SA_Object {
 	public static function autoload($className) {
 		if (preg_match('/^SA_/', $className)) {
-			try {
-				$classFileName = SA_LIB_DIR . "{$className}.php";
-				if (!is_file($classFileName) || !is_readable($classFileName)) {
-					throw new SA_FileNotFound_Exception("File $classFileName not found!");
-				}
-				require_once $classFileName;
-				if (!(class_exists($className) || (interface_exists($className)))) {
-					throw new SA_NoClass_Exception("Class/Interface $className does not exist!");
-				}
-			} catch (Exception $e) {
-				die(SA::prettyDump($e));
-			}
+			$classFileName = SA_LIB_DIR . "{$className}.php";
+			require_once $classFileName;
 		}
 	}
 

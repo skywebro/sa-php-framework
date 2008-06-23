@@ -42,6 +42,7 @@ class SA_DiskCache extends SA_Object {
 		parent::__construct();
 		$this->id = $id;
 		$this->fileName = SA_Application::getInstance()->getCacheDir() . md5(SA_Application::SECRET . $id . SA_Application::SECRET);
+		if (SA_Application::getInstance()->useCache()) touch($this->fileName);
 	}
 
 	public function getData() {
@@ -53,21 +54,14 @@ class SA_DiskCache extends SA_Object {
 	}
 
 	public function load() {
-		$data = null;
-		if (SA_Application::getInstance()->useCache()) {
-			if (is_file($this->fileName) && is_readable($this->fileName)) {
-				$this->data = $data = file_get_contents($this->fileName);
-			}
-		}
-		return $data;
+		if (!SA_Application::getInstance()->useCache()) return null;
+		$this->data = file_get_contents($this->fileName);
+		return $this->data;
 	}
 
 	public function save($data = null) {
 		if (!SA_Application::getInstance()->useCache()) return null;
 		$this->data = is_null($data) ? $this->data : $data;
-		if (!is_writable($outputDir = dirname($this->fileName))) {
-			throw new SA_FileNotFound_Exception("Cache directory ($outputDir) doesn't exist or is not writable!");
-		}
 		return file_put_contents($this->fileName, $this->data, LOCK_EX);
 	}
 
