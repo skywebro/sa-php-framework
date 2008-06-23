@@ -185,7 +185,7 @@ abstract class SA_Application extends SA_Object {
 
 	public function &registerPagePlugin($pluginClass, $pageExp) {
 		$pluginFileName = $this->getPagePluginsDir() . "$pluginClass.php";
-		include_once $pluginFileName;
+		require_once $pluginFileName;
 		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 		$plugin = new $pluginClass($this->request, $this->response, $reg);
 		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
@@ -202,7 +202,7 @@ abstract class SA_Application extends SA_Object {
 		$pagePath = (($dir = dirname($p)) == '.') ? '' : $dir . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
-		include_once $pageFileName;
+		require_once $pageFileName;
 		$className = "Page_$pageName";
 		$this->currentPage = new $className($this->request, $this->response);
 		if (!in_array('SA_IPage', class_implements($this->currentPage))) {
@@ -217,9 +217,12 @@ abstract class SA_Application extends SA_Object {
 		$layout = null;
 		$layoutPath = $this->getLayoutsDir();
 		$layoutFileName = "{$layoutPath}{$layoutName}.php";
-		include_once $layoutFileName;
+		require_once $layoutFileName;
 		$className = "Layout_$layoutName";
 		$layout = new $className($this->request, $this->response);
+		if (!in_array('SA_IPage', class_implements($layout))) {
+			throw new SA_PageInterface_Exception("Layout $className must implement SA_IPage interface!");
+		}
 		$smarty = $layout->getSmarty();
 		$smarty->template_dir = $this->getTemplatesDir() . 'layouts/';
 		$smarty->compile_id = md5($smarty->template_dir);
