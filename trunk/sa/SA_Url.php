@@ -36,8 +36,8 @@ class SA_Url extends SA_Object {
 		$page .= $isDir && $page ? '/' . SA_Application::DEFAULT_PAGE : '';
 		$page = $isAbsolute ? $page : self::$parts->currentPage->getPagePath() . $page;
 		$url = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . self::$parts->baseDir . str_replace('%2F', '/', rawurlencode($page));
-		if ($actions = $params['actions']) {
-			if (!is_array($actions)) $actions = array($actions);
+		if (($actions = $params['actions']) && (is_string($actions) || is_array($actions))) {
+			if(is_string($actions)) $actions = explode(',', $actions);
 			$actions = array_map(create_function('$value', 'return str_replace("/", SA_Url::SLASH, trim($value));'), array_filter($actions, create_function('$value', 'return is_scalar($value) && strcmp($value, "") != 0;')));
 			if ($actionsString = implode(SA_Application::ACTIONS_SEPARATOR, $actions)) $url .= '/' . SA_Application::ACTIONS_VAR_NAME . '/' . rawurlencode($actionsString);
 		}
