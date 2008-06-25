@@ -82,7 +82,7 @@ abstract class SA_Application extends SA_Object {
 		if ($xmlString = $cache->load()) {
 			$xml = new SimpleXMLElement($xmlString);
 		} else {
-			$xml = new SimpleXMLElement("<?xml version='1.0' standalone='yes'?><pages/>");
+			$xml = new SimpleXMLElement('<?xml version="1.0" standalone="yes"?><pages/>');
 			$this->xmlFileSystem($this->getPagesDir(), $xml);
 			$cache->save($xml->asXML());
 		}

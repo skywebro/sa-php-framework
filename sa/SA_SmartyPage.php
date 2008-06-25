@@ -21,6 +21,8 @@
 require_once SMARTY_DIR . 'Smarty.class.php';
 
 abstract class SA_SmartyPage extends SA_Page {
+	const TEMPLATE_EXTENSION = '.tpl';
+
 	protected $smarty = null;
 	protected $template = null;
 	protected $layout = null;
@@ -52,11 +54,7 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function setPageName($name) {
 		parent::setPageName($name);
-		$this->setTemplate($this->useTemplate == true ? $this->getPagePath() . "$name.tpl" : null);
-	}
-
-	public function setPagePath($path) {
-		parent::setPagePath($path);
+		$this->setTemplate($this->useTemplate == true ? $this->getPagePath() . $name . self::TEMPLATE_EXTENSION : null);
 	}
 
 	public function setTemplate($template = null) {
