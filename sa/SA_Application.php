@@ -74,20 +74,19 @@ abstract class SA_Application extends SA_Object {
 	 * @return DOMDocument
 	 */
 
-	public function getDOMPageMap() {
-		static $doc;
+	public function getXMLPageMap() {
+		static $xml;
 
-		if (isset($doc)) return $doc;
+		if (isset($xml)) return $xml;
 		$cache = SA_SimpleCache::singleton('__XML_PAGES_MAP__');
-		$doc = new DOMDocument('1.0');
-		if ($domString = $cache->load()) {
-			$doc->loadXML($domString);
+		if ($xmlString = $cache->load()) {
+			$xml = new SimpleXMLElement($xmlString);
 		} else {
-			$doc->appendChild($pages = new DOMElement('pages'));
-			$this->domFileSystem($this->getPagesDir(), $pages);
-			$cache->save($doc->saveXML());
+			$xml = new SimpleXMLElement("<?xml version='1.0' standalone='yes'?><pages/>");
+			$this->xmlFileSystem($this->getPagesDir(), $xml);
+			$cache->save($xml->asXML());
 		}
-		return $doc;
+		return $xml;
 	}
 
 	public function &getCurrentPage() {
@@ -278,20 +277,20 @@ abstract class SA_Application extends SA_Object {
 		}
 	}
 
-	protected function domFileSystem($dir, DOMElement $node) {
+	protected function xmlFileSystem($dir, SimpleXMLElement $xml) {
 		try {
 			$dirIterator = new DirectoryIterator($dir);
 			foreach ($dirIterator as $entry) {
 				$entryName = $entry->getFilename();
 				if ($entry->isDir()) {
 					if (!$entry->isDot()) {
-						$node->appendChild($newNode = new DOMElement('dir'));
-						$newNode->setAttribute('name', $entryName);
-						$this->domFileSystem($dir . '/' . $entryName, $newNode);
+						$node = $xml->addChild('dir');
+						$node->addAttribute('name', $entryName);
+						$this->xmlFileSystem($dir . '/' . $entryName, $node);
 					}
 				} else {
-					$node->appendChild($newNode = new DOMElement('file'));
-					$newNode->setAttribute('name', $entryName);
+					$node = $xml->addChild('file');
+					$node->addAttribute('name', $entryName);
 				}
 			}
 		} catch (Exception $e) {}

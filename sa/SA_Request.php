@@ -105,12 +105,12 @@ class SA_Request extends SA_Object {
 			return implode('/', $xpath);
 		}
 
-		$xPath = new DOMXPath(SA_Application::getInstance()->getDOMPageMap());
+		$xmlFS = SA_Application::getInstance()->getXMLPageMap();
 		for($i = 0; $i < count($pathInfoArray); $i++) {
 			if (strlen($partialPathInfo = implode('/', $pathInfoStack))) {
-				if ((substr($partialPathInfo, -1) == '/') && $xPath->query(pageXPath($pathInfoStack, 'dir'))->length) {
+				if ((substr($partialPathInfo, -1) == '/') && (($nodes = $xmlFS->xpath(pageXPath($pathInfoStack, 'dir'))) !== false) && count($nodes)) {
 					$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
-				} elseif ($xPath->query(pageXPath($pathInfoStack, 'file'))->length) {
+				} elseif ((($nodes = $xmlFS->xpath(pageXPath($pathInfoStack, 'file'))) !== false) && count($nodes)) {
 					$pageName = trim($partialPathInfo, "\t /");
 				}
 				if ($pageName) break;
