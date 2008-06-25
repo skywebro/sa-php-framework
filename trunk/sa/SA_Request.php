@@ -92,7 +92,7 @@ class SA_Request extends SA_Object {
 			if (!is_array($pathInfo)) return null;
 			$pathInfo = array_filter($pathInfo, create_function('$value', 'return trim($value) !== "";'));
 			$xpath = array('//pages');
-			if ($type == 'file') $fileName = preg_replace('/[^a-z0-9_\/]/i', '_', array_pop($pathInfo));
+			if ($type == 'file') $fileName = array_pop($pathInfo);
 			foreach($pathInfo as $value) {
 				$xpath[] = "dir[@name='$value']";
 			}
@@ -111,9 +111,7 @@ class SA_Request extends SA_Object {
 				if ((substr($partialPathInfo, -1) == '/') && (($nodes = $xmlFS->xpath(pageXPath($pathInfoStack, 'dir'))) !== false) && count($nodes)) {
 					$pageName = $partialPathInfo . SA_Application::DEFAULT_PAGE;
 				} elseif ((($nodes = $xmlFS->xpath(pageXPath($pathInfoStack, 'file'))) !== false) && count($nodes)) {
-					$pagePath = dirname($partialPathInfo);
-					$pageName = trim(preg_replace('/[^a-z0-9_\/]/i', '_', basename($partialPathInfo)));
-					$pageName = "$pagePath/$pageName";
+					$pageName = $partialPathInfo;
 				}
 				if ($pageName) break;
 			}

@@ -197,7 +197,7 @@ abstract class SA_Application extends SA_Object {
 	public function &pageFactory($pageName = null) {
 		$p = $this->request->r(self::PAGE_VAR_NAME);
 		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
-		$pageName = basename($p);
+		$pageName = trim(preg_replace('/[^a-z0-9_\/]/i', '_', basename($p)));
 		$pagePath = (($dir = dirname($p)) == '.') ? '' : $dir . '/';
 		$pagesDir = $this->getPagesDir();
 		$pageFileName = "{$pagesDir}{$p}.php";
