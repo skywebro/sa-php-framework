@@ -52,13 +52,11 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function setPageName($name) {
 		parent::setPageName($name);
-		$this->setTemplate($this->useTemplate == true ? "$name.tpl" : null);
+		$this->setTemplate($this->useTemplate == true ? $this->getPagePath() . "$name.tpl" : null);
 	}
 
 	public function setPagePath($path) {
 		parent::setPagePath($path);
-		$this->smarty->template_dir = SA_Application::getInstance()->getTemplatesDir() . $path;
-		$this->smarty->compile_id = md5($this->smarty->template_dir);
 	}
 
 	public function setTemplate($template = null) {
@@ -90,6 +88,7 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function &content($content = null) {
 		$content .= $this->hasTemplate() ? $this->fetch() : null;
+		if (is_string($this->layout)) $this->setLayout($this->layout);
 		if ($this->hasLayout()) {
 			$this->layout->assign('__CONTENT_FOR_LAYOUT__', $content);
 			$content = $this->layout->fetch();

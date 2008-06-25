@@ -19,8 +19,9 @@
  */
 
 class Page_InDex extends SA_SmartyPage {
+	protected $layout = 'default';
+
 	public function init() {
-		$this->setLayout('default');
 		$this->assign('msg', 'in smarty page index');
 	}
 
