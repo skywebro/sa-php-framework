@@ -59,6 +59,10 @@ abstract class SA_Application extends SA_Object {
 		session_start();
 	}
 
+	public function __destruct() {
+		print '<p style="font:.75em normal verdana,helvetica,serif;">&copy; 2008 Petre Tr&icirc;nculescu &middot; <a href="http://skyweb.ro/" target="_blank">skyweb development</a></p>';
+	}
+
 	public function useCache($cache = null) {
 		$this->noCache = is_null($cache) ? $this->noCache : !$cache;
 		return !$this->noCache;
