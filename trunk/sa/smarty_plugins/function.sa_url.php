@@ -20,8 +20,8 @@
 
 function smarty_function_sa_url($params, &$smarty) {
 	$page = $params['page']; unset($params['page']);
-	$port = isset($params['port']) ? $params['port'] : 80; unset($params['port']);
-	$secure = isset($params['secure']) ? $params['secure'] : false; unset($params['secure']);
+	$port = $params['port']; unset($params['port']);
+	$secure = $params['secure']; unset($params['secure']);
 
 	try {
 		$url = SA_Url::url($page, $params, $port, $secure);
