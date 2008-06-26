@@ -25,9 +25,10 @@ class SA_Url extends SA_Object {
 
 	protected static $parts = null;
 
-	public static function url($page = null, $params = array(), $port = 80, $secure = false) {
+	public static function url($page = null, $params = array(), $port = null, $secure = null) {
 		SA_Url::init();
-		$protocol = $secure ? 'https' : 'http';
+		$protocol = empty($secure) ? self::$parts->protocol : ($secure ? 'https' : 'http');
+		$port = empty($port) ? self::$parts->port : $port;
 		$page = trim($page);
 		$page = empty($page) ? SA_Application::DEFAULT_PAGE : preg_match('/^\/{1,}$/', $page) ? '/' . SA_Application::DEFAULT_PAGE : $page;
 		$isAbsolute = strpos($page, '/') === 0;
@@ -63,9 +64,7 @@ class SA_Url extends SA_Object {
 
 	public static function baseHref() {
 		SA_Url::init();
-		$protocol = self::$parts->app->request()->s('HTTPS') ? 'https' : 'http';
-		$port = self::$parts->app->request()->s('SERVER_PORT');
-		$baseHref = "$protocol://" . self::$parts->host . ($port == 80 ? '' : ":$port") . self::$parts->baseDir;
+		$baseHref = self::$parts->protocol . '://' . self::$parts->host . (self::$parts->port == 80 ? '' : ':' . self::$parts->port) . self::$parts->baseDir;
 
 		return $baseHref;
 	}
@@ -76,6 +75,8 @@ class SA_Url extends SA_Object {
 			$app = &SA_Application::getInstance();
 			self::$parts->app = $app;
 			self::$parts->host = $app->request()->s('HTTP_HOST');
+			self::$parts->protocol = self::$parts->app->request()->s('HTTPS') ? 'https' : 'http';
+			self::$parts->port = self::$parts->app->request()->s('SERVER_PORT');
 			self::$parts->currentPage = $app->getCurrentPage();
 			self::$parts->baseDir = dirname(self::$parts->app->request()->s('SCRIPT_NAME'));
 			self::$parts->baseDir = self::$parts->baseDir == '/' ? '/' : self::$parts->baseDir . '/';
