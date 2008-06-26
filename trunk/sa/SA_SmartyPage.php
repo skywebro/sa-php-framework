@@ -49,7 +49,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function hasTemplate() {
-		return ($this->useTemplate == true) && (!is_null($this->template));
+		return ($this->useTemplate == true) && (!empty($this->template));
 	}
 
 	public function setPageName($name) {
@@ -59,7 +59,7 @@ abstract class SA_SmartyPage extends SA_Page {
 
 	public function setTemplate($template = null) {
 		$this->template = $template;
-		$this->useTemplate = !is_null($this->template);
+		$this->useTemplate = !empty($this->template);
 	}
 
 	public function getTemplate($template) {
@@ -67,11 +67,11 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function setLayout($layoutName = null) {
-		return $this->layout = is_null($layoutName) ? null : SA_Application::getInstance()->layoutFactory($layoutName);
+		return $this->layout = empty($layoutName) ? null : SA_Application::getInstance()->layoutFactory($layoutName);
 	}
 
 	public function hasLayout() {
-		return !is_null($this->layout) && is_a($this->layout, 'SA_IPage');
+		return !empty($this->layout) && is_a($this->layout, 'SA_IPage');
 	}
 
 	public function &getLayout() {
@@ -79,7 +79,7 @@ abstract class SA_SmartyPage extends SA_Page {
 	}
 
 	public function fetch($template = null) {
-		$template = is_null($template) ? $this->template : $template;
+		$template = empty($template) ? $this->template : $template;
 		if (!$this->smarty->template_exists($template)) throw new SA_FileNotFound_Exception($this->smarty->template_dir . $template . ' does not exist.');
 		return $this->smarty->fetch($template);
 	}
