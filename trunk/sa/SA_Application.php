@@ -189,7 +189,7 @@ abstract class SA_Application extends SA_Object {
 	public function &registerPagePlugin($pluginClass, $pageExp) {
 		$pluginFileName = $this->getPagePluginsDir() . "$pluginClass.php";
 		require_once $pluginFileName;
-		$plugin = new $pluginClass($this->request, $this->response, $reg);
+		$plugin = new $pluginClass($this->request, $this->response, $pageExp);
 		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
 			throw new SA_PageInterface_Exception("Class $pluginClass must implement SA_IPagePlugin interface!");
 		}
@@ -281,12 +281,11 @@ abstract class SA_Application extends SA_Object {
 
 	protected function runPagePlugins($plugins, $pageExp, $args) {
 		list($page, $event) = $args;
-		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
-		if (preg_match($reg, $page)) {
-			foreach($plugins as $plugin) {
-				if (method_exists($plugin, $event)) $plugin->$event();
-			}
-		}
+		if (preg_match('/' . str_replace('/', '\/', $pageExp) . '/', $page)) array_walk($plugins, array(&$this, 'runPagePluginEvent'), $event);
+	}
+
+	protected function runPagePluginEvent(SA_IPagePlugin $plugin, $key, $event) {
+		if ($plugin->isValidEvent($event)) $plugin->$event();
 	}
 
 	protected function xmlFileSystem($dir, SimpleXMLElement $xml) {
