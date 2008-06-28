@@ -243,12 +243,12 @@ abstract class SA_Application extends SA_Object {
 	public function run($sendHeaders = true) {
 		try {
 			ob_start();
-			$this->runPagePlugins($this->request->r(self::PAGE_VAR_NAME), 'beforeCreation');
+			$this->pagePluginsWalk($this->request->r(self::PAGE_VAR_NAME), 'beforeCreation');
 			$page = $this->pageFactory();
 			$pageName = $page->getPagePath() . $page->getPageName();
-			$this->runPagePlugins($pageName, 'afterCreation');
+			$this->pagePluginsWalk($pageName, 'afterCreation');
 			$page->init();
-			$this->runPagePlugins($pageName, 'beforeProcess');
+			$this->pagePluginsWalk($pageName, 'beforeProcess');
 			if (is_array($actions = $this->request->r(self::ACTIONS_VAR_NAME))) {
 				foreach($actions as $action) {
 					$action = preg_replace('/[^a-z0-9_]/i', '_', $action);
@@ -261,26 +261,30 @@ abstract class SA_Application extends SA_Object {
 			} elseif ($this->request->isPost()) {
 				$page->post();
 			}
-			$this->runPagePlugins($pageName, 'afterProcess');
+			$this->pagePluginsWalk($pageName, 'afterProcess');
 			$page->cleanup();
 			$output = ob_get_contents();
 			ob_end_clean();
 			$output = $page->content($output);
 			$this->response->body($output);
-			$this->runPagePlugins($pageName, 'beforeDisplay');
+			$this->pagePluginsWalk($pageName, 'beforeDisplay');
 			$this->response->send($sendHeaders);
-			$this->runPagePlugins($pageName, 'afterDisplay');
+			$this->pagePluginsWalk($pageName, 'afterDisplay');
 		} catch(Exception $e) {
 			$this->error($e);
 		}
 	}
 
-	protected function runPagePlugins($page, $event) {
-		reset($this->pagePlugins);
-		foreach($this->pagePlugins as $pageExp => $plugins) {
-			$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
-			if (preg_match($reg, $page)) {
-				foreach($plugins as $plugin) if(method_exists($plugin, $event)) $plugin->$event();
+	protected function pagePluginsWalk($page, $event) {
+		array_walk($this->pagePlugins, array(&$this, 'runPagePlugins'), array($page, $event));
+	}
+
+	protected function runPagePlugins($plugins, $pageExp, $args) {
+		list($page, $event) = $args;
+		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
+		if (preg_match($reg, $page)) {
+			foreach($plugins as $plugin) {
+				if (method_exists($plugin, $event)) $plugin->$event();
 			}
 		}
 	}
