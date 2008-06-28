@@ -89,6 +89,13 @@ abstract class SA_SmartyPage extends SA_Page {
 		if (is_string($this->layout)) $this->setLayout($this->layout);
 		if ($this->hasLayout()) {
 			$this->layout->assign('__CONTENT_FOR_LAYOUT__', $content);
+			$this->layout->init();
+			if ($this->request->isGet()) {
+				$this->layout->get();
+			} elseif ($this->request->isPost()) {
+				$this->layout->post();
+			}
+			$this->layout->cleanup();
 			$content = $this->layout->fetch();
 		}
 		return parent::content($content);
