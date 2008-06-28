@@ -198,6 +198,12 @@ abstract class SA_Application extends SA_Object {
 		return $this;
 	}
 
+	public function &unregisterPagePlugin($pluginClass, $pageExp) {
+		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
+		unset($this->pagePlugins[$reg][md5("{$pluginClass}{$reg}")]);
+		return $this;
+	}
+
 	public function &pageFactory($pageName = null) {
 		$p = $this->request->r(self::PAGE_VAR_NAME);
 		$p = empty($pageName) ?  (empty($p) ? self::DEFAULT_PAGE : $p) : $pageName;
