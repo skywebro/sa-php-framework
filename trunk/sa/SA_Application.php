@@ -189,19 +189,16 @@ abstract class SA_Application extends SA_Object {
 	public function &registerPagePlugin($pluginClass, $pageExp) {
 		$pluginFileName = $this->getPagePluginsDir() . "$pluginClass.php";
 		require_once $pluginFileName;
-		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 		$plugin = new $pluginClass($this->request, $this->response, $reg);
 		if (!in_array('SA_IPagePlugin', class_implements($plugin))) {
 			throw new SA_PageInterface_Exception("Class $pluginClass must implement SA_IPagePlugin interface!");
 		}
-		$this->pagePlugins[$reg][md5("{$pluginClass}{$reg}")] = $plugin;
+		$this->pagePlugins[$pageExp][md5("{$pluginClass}{$pageExp}")] = $plugin;
 		return $this;
 	}
 
-	public function &unregisterPagePlugin($pluginClass, $pageExp) {
-		$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
-		unset($this->pagePlugins[$reg][md5("{$pluginClass}{$reg}")]);
-		return $this;
+	public function unregisterPagePlugin($pluginClass, $pageExp) {
+		unset($this->pagePlugins[$pageExp][md5("{$pluginClass}{$pageExp}")]);
 	}
 
 	public function &pageFactory($pageName = null) {
@@ -280,9 +277,10 @@ abstract class SA_Application extends SA_Object {
 
 	protected function runPagePlugins($page, $event) {
 		reset($this->pagePlugins);
-		foreach($this->pagePlugins as $reg => $plugins) {
+		foreach($this->pagePlugins as $pageExp => $plugins) {
+			$reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 			if (preg_match($reg, $page)) {
-				foreach($plugins as $plugin) $plugin->$event();
+				foreach($plugins as $plugin) if(method_exists($plugin, $event)) $plugin->$event();
 			}
 		}
 	}
