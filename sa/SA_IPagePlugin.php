@@ -20,6 +20,7 @@
 
 interface SA_IPagePlugin {
 	public function pageMatch($page);
+	public function isValidEvent($event);
 	public function beforeCreation();
 	public function beforeProcess();
 	public function beforeDisplay();

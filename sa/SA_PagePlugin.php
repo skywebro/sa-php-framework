@@ -21,15 +21,18 @@
 abstract class SA_PagePlugin implements SA_IPagePlugin {
 	protected $request = null;
 	protected $response = null;
-	protected $pageExp = null;
+	protected $reg = null;
 
 	public function __construct(SA_Request $request, SA_Response $response, $pageExp) {
 		$this->request = $request;
 		$this->response = $response;
-		$this->pageExp = '/' . str_replace('/', '\/', $pageExp) . '/';
+		$this->reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 	}
 	public function pageMatch($page) {
-		return preg_match($this->pageExp, $page);
+		return preg_match($this->reg, $page);
+	}
+	public function isValidEvent($event) {
+		return method_exists($this, $event);
 	}
 	public function beforeCreate() {}
 	public function beforeProcess() {}
