@@ -229,9 +229,6 @@ abstract class SA_Application extends SA_Object {
 		if (!in_array('SA_IPage', class_implements($layout))) {
 			throw new SA_PageInterface_Exception("Layout $className must implement SA_IPage interface!");
 		}
-		$smarty = $layout->getSmarty();
-		$smarty->template_dir = $this->getTemplatesDir() . 'layouts/';
-		$smarty->compile_id = md5($smarty->template_dir);
 		$layout->setPageName($layoutName);
 		return $layout;
 	}

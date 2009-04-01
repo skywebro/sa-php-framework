@@ -18,4 +18,11 @@
  * $Id$
  */
 
-class SA_Layout extends SA_SmartyPage {}
+class SA_Layout extends SA_SmartyPage {
+	public function __construct(SA_Request $request, SA_Response $response) {
+		parent::__construct($request, $response);
+
+		$this->smarty->template_dir = SA_Application::getInstance()->getTemplatesDir() . 'layouts/';
+		$this->smarty->compile_id = md5($this->smarty->template_dir);
+	}
+}
