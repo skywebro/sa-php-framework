@@ -40,7 +40,7 @@ abstract class SA_SmartyPage extends SA_Page {
 		$this->smarty->assign_by_ref('__PAGE__', $this);
 	}
 
-	public function &getSmarty() {
+	public function &getTemplateObj() {
 		return $this->smarty;
 	}
 
