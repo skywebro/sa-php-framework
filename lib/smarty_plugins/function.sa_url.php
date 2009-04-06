@@ -15,12 +15,19 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: function.sa_url.php 76 2008-06-26 08:08:02Z andi.trinculescu $
  */
 
-class SA_Exception extends Exception {
-	public function __construct($message = null, $code = 0) {
-		$message = "<div style='color:red;font-weight:bold;'>ERROR:&nbsp;$message</div>";
-		parent::__construct($message, $code);
+function smarty_function_sa_url($params, &$smarty) {
+	$page = $params['page']; unset($params['page']);
+	$port = $params['port']; unset($params['port']);
+	$secure = $params['secure']; unset($params['secure']);
+
+	try {
+		$url = SA_Url::url($page, $params, $port, $secure);
+	} catch(Exception $e) {
+		SA_Application::getInstance()->error($e);
 	}
+
+	return $url;
 }

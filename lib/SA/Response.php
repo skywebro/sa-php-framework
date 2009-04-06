@@ -15,7 +15,47 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_Response.php 56 2008-06-22 12:28:06Z andi.trinculescu $
  */
 
-class SA_NoClass_Exception extends SA_Exception {}
+class SA_Response extends SA_Object {
+	protected $headers = null;
+	protected $body = null;
+
+	public function __construct() {
+		parent::__construct();
+		$this->headers = new ArrayObject();
+		$this->headers['Content-type'] = 'text/html; charset=utf-8';
+	}
+
+	public function &headers($key = null, $value = null) {
+		$result = null;
+		if (is_null($key)) {
+			$result = &$this->headers;
+		} elseif (is_null($value)) {
+			$result = &$this->headers[$key];
+		} else {
+			$result = &$this->headers[$key];
+			$this->headers[$key] = $value;
+		}
+		return $result;
+	}
+
+	public function sendHeaders() {
+		if (!headers_sent()) {
+			for($i = $this->headers->getIterator(); $i->valid(); $i->next()) {
+				header($i->key() . ': ' . $i->current());
+			}
+		}
+	}
+
+	public function &body($content = null) {
+		if (!is_null($content)) $this->body = $content;
+		return $this->body;
+	}
+
+	public function send($sendHeaders = true) {
+		if ($sendHeaders) $this->sendHeaders();
+		print $this->body();
+	}
+}

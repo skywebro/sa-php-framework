@@ -15,7 +15,16 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_IPagePlugin.php 84 2008-06-28 16:00:27Z andi.trinculescu $
  */
 
-class SA_NoPage_Exception extends SA_Exception {}
+interface SA_IPagePlugin {
+	public function pageMatch($page);
+	public function isValidEvent($event);
+	public function beforeCreation();
+	public function beforeProcess();
+	public function beforeDisplay();
+	public function afterCreation();
+	public function afterProcess();
+	public function afterDisplay();
+}

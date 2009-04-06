@@ -1,4 +1,4 @@
-{* $Id$ *}
+{* $Id: default.tpl 71 2008-06-24 14:14:24Z andi.trinculescu $ *}
 <base href="{sa_base_href}">
 <title>default layout</title>
 <div style="border:1px solid navy;padding:5px;">{$__CONTENT_FOR_LAYOUT__}</div>

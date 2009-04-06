@@ -15,7 +15,20 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: bootstrap.tmpl 65 2008-06-22 23:11:41Z andi.trinculescu $
  */
 
-class SA_NoApplication_Exception extends SA_Exception {}
+define('DEBUG', true);
+//define('USE_CACHE', false); //safety flag
+define('BASE_DIR', dirname(__FILE__) . '/../');
+define('SA_LIB_DIR', BASE_DIR . 'lib/');
+define('SMARTY_DIR', BASE_DIR . 'smarty/');
+
+set_include_path(SA_LIB_DIR . PATH_SEPARATOR . get_include_path());
+
+require_once SA_LIB_DIR . 'SA/SA.php';
+spl_autoload_register('SA::autoload');
+
+require_once BASE_DIR . 'Demo_Application.php';
+
+

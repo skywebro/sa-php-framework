@@ -15,18 +15,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_NoClass_Exception.php 63 2008-06-22 21:41:42Z andi.trinculescu $
  */
 
-define('DEBUG', true);
-//define('USE_CACHE', false); //safety flag
-define('BASE_DIR', dirname(__FILE__) . '/../');
-define('SA_LIB_DIR', BASE_DIR . 'sa/');
-define('SMARTY_DIR', BASE_DIR . 'smarty/');
-
-require_once SA_LIB_DIR . 'SA.php';
-spl_autoload_register('SA::autoload');
-
-require_once BASE_DIR . 'Demo_Application.php';
-
-
+class SA_NoClass_Exception extends SA_Exception {}

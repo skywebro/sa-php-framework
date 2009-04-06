@@ -15,14 +15,16 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA.php 67 2008-06-23 00:20:16Z andi.trinculescu $
  */
 
-class SA_Layout extends SA_SmartyPage {
-	public function __construct(SA_Request $request, SA_Response $response) {
-		parent::__construct($request, $response);
+class SA {
+	public static function autoload($className) {
+		$classFileName = implode(DIRECTORY_SEPARATOR, explode('_', $className));
+		require_once "{$classFileName}.php";
+	}
 
-		$this->smarty->template_dir = SA_Application::getInstance()->getTemplatesDir() . 'layouts/';
-		$this->smarty->compile_id = md5($this->smarty->template_dir);
+	public static function prettyDump($var) {
+		print '<div style="font-family:arial,helvetica,serif;font-size:12px;background-color:black;color:lime;padding:5px;border:3px solid red;">' . nl2br($var) . '</div>';
 	}
 }

@@ -15,57 +15,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_NoPage_Exception.php 13 2008-06-20 12:02:33Z andi.trinculescu $
  */
 
-abstract class SA_Page extends SA_Object implements SA_IPage {
-	protected $request = null;
-	protected $response = null;
-	protected $name = null;
-	protected $path = null;
-	protected $content = null;
-
-	public function __construct(SA_Request $request, SA_Response $response) {
-		parent::__construct();
-		$this->name = $name;
-		$this->request = $request;
-		$this->response = $response;
-	}
-
-	public function setPageName($name) {
-		$this->name = $name;
-	}
-
-	public function getPageName() {
-		return $this->name;
-	}
-
-	public function setPagePath($path) {
-		$this->path = $path;
-	}
-
-	public function getPagePath() {
-		return $this->path;
-	}
-
-	public function &headers($key = null, $value = null) {
-		return $this->response->headers($key, $value);
-	}
-
-	public function init() {}
-
-	public function get() {}
-
-	public function post() {}
-
-	public function cleanup() {}
-
-	public function &content($content = null) {
-		if (!is_null($content)) $this->content = $content;
-		return $this->content;
-	}
-
-	public function display() {
-		print $this->content();
-	}
-}
+class SA_NoPage_Exception extends SA_Exception {}

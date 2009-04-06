@@ -15,7 +15,18 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_IPage.php 12 2008-06-20 09:25:20Z andi.trinculescu $
  */
 
-class SA_Url_Exception extends SA_Exception {}
+interface SA_IPage {
+	public function setPageName($name);
+	public function getPageName();
+	public function setPagePath($path);
+	public function getPagePath();
+	public function init();
+	public function get();
+	public function post();
+	public function &content($content = null);
+	public function display();
+	public function cleanup();
+}

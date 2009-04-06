@@ -15,18 +15,15 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: function.sa_base_href.php 66 2008-06-22 23:38:24Z andi.trinculescu $
  */
 
-interface SA_IPage {
-	public function setPageName($name);
-	public function getPageName();
-	public function setPagePath($path);
-	public function getPagePath();
-	public function init();
-	public function get();
-	public function post();
-	public function &content($content = null);
-	public function display();
-	public function cleanup();
+function smarty_function_sa_base_href($params, &$smarty) {
+	try {
+		$baseHref = SA_Url::baseHref();
+	} catch(Exception $e) {
+		SA_Application::getInstance()->error($e);
+	}
+
+	return $baseHref;
 }

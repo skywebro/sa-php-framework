@@ -1,4 +1,4 @@
-{* $Id$ *}
+{* $Id: index.tpl 57 2008-06-22 12:47:51Z andi.trinculescu $ *}
 
 <p>{$msg}</p>
 <div>

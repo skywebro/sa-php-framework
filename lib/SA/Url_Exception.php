@@ -15,7 +15,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_Url_Exception.php 66 2008-06-22 23:38:24Z andi.trinculescu $
  */
 
-class SA_FileNotFound_Exception extends SA_Exception {}
+class SA_Url_Exception extends SA_Exception {}

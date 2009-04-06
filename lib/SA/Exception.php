@@ -15,14 +15,12 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id$
+ * $Id: SA_Exception.php 14 2008-06-20 13:01:38Z andi.trinculescu $
  */
 
-require_once 'bootstrap.php';
-
-try {
-	$demo = new Demo_Application(BASE_DIR . 'app/');
-	$demo->registerPagePlugin('DemoPlugin', 'nested/')->run();
-} catch (Exception $e) {
-	SA::prettyDump($e);
+class SA_Exception extends Exception {
+	public function __construct($message = null, $code = 0) {
+		$message = "<div style='color:red;font-weight:bold;'>ERROR:&nbsp;$message</div>";
+		parent::__construct($message, $code);
+	}
 }
