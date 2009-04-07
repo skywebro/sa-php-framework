@@ -18,4 +18,4 @@
  * $Id: SA_PageInterface_Exception.php 13 2008-06-20 12:02:33Z andi.trinculescu $
  */
 
-class SA_PageInterface_Exception extends SA_Exception {}
+class SA_PageInterfaceException extends SA_Exception {}

@@ -15,7 +15,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * $Id: SA_FileNotFound_Exception.php 13 2008-06-20 12:02:33Z andi.trinculescu $
+ * $Id: SA_DirNotFound_Exception.php 13 2008-06-20 12:02:33Z andi.trinculescu $
  */
 
-class SA_FileNotFound_Exception extends SA_Exception {}
+class SA_DirNotFoundException extends SA_Exception {}

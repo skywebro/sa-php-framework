@@ -18,4 +18,4 @@
  * $Id: SA_NoApplication_Exception.php 13 2008-06-20 12:02:33Z andi.trinculescu $
  */
 
-class SA_NoApplication_Exception extends SA_Exception {}
+class SA_NoApplicationException extends SA_Exception {}
