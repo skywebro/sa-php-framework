@@ -18,24 +18,44 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+class SA_Response extends SA_Object {
+	protected $headers = null;
+	protected $body = null;
 
-	public function doSomething() {
-		print 'something... ';
+	public function __construct() {
+		parent::__construct();
+		$this->headers = new ArrayObject();
+		$this->headers['Content-type'] = 'text/html; charset=utf-8';
 	}
 
-	public function doElse() {
-		print 'else... ';
+	public function &headers($key = null, $value = null) {
+		$result = null;
+		if (is_null($key)) {
+			$result = &$this->headers;
+		} elseif (is_null($value)) {
+			$result = &$this->headers[$key];
+		} else {
+			$result = &$this->headers[$key];
+			$this->headers[$key] = $value;
+		}
+		return $result;
 	}
 
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
+	public function sendHeaders() {
+		if (!headers_sent()) {
+			for($i = $this->headers->getIterator(); $i->valid(); $i->next()) {
+				header($i->key() . ': ' . $i->current());
+			}
+		}
+	}
+
+	public function &body($content = null) {
+		if (!is_null($content)) $this->body = $content;
+		return $this->body;
+	}
+
+	public function send($sendHeaders = true) {
+		if ($sendHeaders) $this->sendHeaders();
+		print $this->body();
 	}
 }
