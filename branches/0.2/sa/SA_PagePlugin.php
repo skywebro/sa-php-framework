@@ -18,24 +18,26 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+abstract class SA_PagePlugin implements SA_IPagePlugin {
+	protected $request = null;
+	protected $response = null;
+	protected $reg = null;
 
-	public function doSomething() {
-		print 'something... ';
+	public function __construct(SA_Request $request, SA_Response $response, $pageExp) {
+		$this->request = $request;
+		$this->response = $response;
+		$this->reg = '/' . str_replace('/', '\/', $pageExp) . '/';
 	}
-
-	public function doElse() {
-		print 'else... ';
+	public function pageMatch($page) {
+		return preg_match($this->reg, $page);
 	}
-
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
+	public function isValidEvent($event) {
+		return method_exists($this, $event);
 	}
+	public function beforeCreate() {}
+	public function beforeProcess() {}
+	public function beforeDisplay() {}
+	public function afterCreate() {}
+	public function afterProcess() {}
+	public function afterDisplay() {}
 }

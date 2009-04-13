@@ -18,24 +18,12 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
-
-	public function doSomething() {
-		print 'something... ';
+function smarty_function_sa_base_href($params, &$smarty) {
+	try {
+		$baseHref = SA_Url::baseHref();
+	} catch(Exception $e) {
+		SA_Application::getInstance()->error($e);
 	}
 
-	public function doElse() {
-		print 'else... ';
-	}
-
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
-	}
+	return $baseHref;
 }

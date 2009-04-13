@@ -18,24 +18,15 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+define('DEBUG', true);
+//define('USE_CACHE', false); //safety flag
+define('BASE_DIR', dirname(__FILE__) . '/../');
+define('SA_LIB_DIR', BASE_DIR . 'sa/');
+define('SMARTY_DIR', BASE_DIR . 'smarty/');
 
-	public function doSomething() {
-		print 'something... ';
-	}
+require_once SA_LIB_DIR . 'SA.php';
+spl_autoload_register('SA::autoload');
 
-	public function doElse() {
-		print 'else... ';
-	}
+require_once BASE_DIR . 'Demo_Application.php';
 
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
-	}
-}
+

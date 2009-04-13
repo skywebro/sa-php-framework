@@ -18,24 +18,54 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+abstract class SA_Page extends SA_Object implements SA_IPage {
+	protected $request = null;
+	protected $response = null;
+	protected $name = null;
+	protected $path = null;
+	protected $content = null;
 
-	public function doSomething() {
-		print 'something... ';
+	public function __construct(SA_Request $request, SA_Response $response) {
+		parent::__construct();
+		$this->name = $name;
+		$this->request = $request;
+		$this->response = $response;
 	}
 
-	public function doElse() {
-		print 'else... ';
+	public function setPageName($name) {
+		$this->name = $name;
 	}
 
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
+	public function getPageName() {
+		return $this->name;
+	}
+
+	public function setPagePath($path) {
+		$this->path = $path;
+	}
+
+	public function getPagePath() {
+		return $this->path;
+	}
+
+	public function &headers($key = null, $value = null) {
+		return $this->response->headers($key, $value);
+	}
+
+	public function init() {}
+
+	public function get() {}
+
+	public function post() {}
+
+	public function cleanup() {}
+
+	public function &content($content = null) {
+		if (!is_null($content)) $this->content = $content;
+		return $this->content;
+	}
+
+	public function display() {
+		print $this->content();
 	}
 }

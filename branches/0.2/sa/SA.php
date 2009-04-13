@@ -18,24 +18,17 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+require_once 'SA_Object.php';
 
-	public function doSomething() {
-		print 'something... ';
+class SA extends SA_Object {
+	public static function autoload($className) {
+		if (preg_match('/^SA_/', $className)) {
+			$classFileName = SA_LIB_DIR . "{$className}.php";
+			require_once $classFileName;
+		}
 	}
 
-	public function doElse() {
-		print 'else... ';
-	}
-
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
+	public static function prettyDump($var) {
+		print '<div style="font-family:arial,helvetica,serif;font-size:12px;background-color:black;color:lime;padding:5px;border:3px solid red;">' . nl2br($var) . '</div>';
 	}
 }

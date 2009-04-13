@@ -18,24 +18,11 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+require_once 'bootstrap.php';
 
-	public function doSomething() {
-		print 'something... ';
-	}
-
-	public function doElse() {
-		print 'else... ';
-	}
-
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
-	}
+try {
+	$demo = new Demo_Application(BASE_DIR . 'app/');
+	$demo->registerPagePlugin('DemoPlugin', 'nested/')->run();
+} catch (Exception $e) {
+	SA::prettyDump($e);
 }

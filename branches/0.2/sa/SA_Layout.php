@@ -18,24 +18,11 @@
  * $Id$
  */
 
-class Page_index extends SA_SmartyPage {
-	protected $useTemplate = false;
+class SA_Layout extends SA_SmartyPage {
+	public function __construct(SA_Request $request, SA_Response $response) {
+		parent::__construct($request, $response);
 
-	public function doSomething() {
-		print 'something... ';
-	}
-
-	public function doElse() {
-		print 'else... ';
-	}
-
-	public function get() {
-		print 'nested page without template';
-		print '<br>';
-		print '<div>';
-		print '<b>Request dump</b>:';
-		print SA::prettyDump(var_export($this->request->r(), true));
-		print '</div>';
-		print '<a href="' . SA_Url::url('/') . '">back</a>';
+		$this->smarty->template_dir = SA_Application::getInstance()->getTemplatesDir() . 'layouts/';
+		$this->smarty->compile_id = md5($this->smarty->template_dir);
 	}
 }
